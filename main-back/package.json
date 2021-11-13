@@ -51,7 +51,7 @@
   "scripts": {
     "start": "NODE_PATH=./build node build/apps/main-gql/index.js",
     "postinstall": "test -n \"$NOYARNPOSTINSTALL\" || npm run postinstall:script",
-    "postinstall:script": "npm run db:intro:withoutenv && npm run build",
+    "postinstall:script": "npm run db:intro:withoutenv && npm run gql:gen && npm run build",
     "test": "jest --passWithNoTests",
     "gql:gen": "graphql-codegen --config codegen.yaml",
     "db:intro:withoutenv": "NODE_TLS_REJECT_UNAUTHORIZED=0 schemats generate -C --config ./src/libs/main-db/schemats.js -o ./src/libs/main-db/schemats-schema.ts",
