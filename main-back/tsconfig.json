@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "outDir": "build",
+    "sourceMap": true,
+    "importHelpers": true,
+    "emitDecoratorMetadata": true,
+    "noImplicitReturns": true,
+    "target": "es2018",
+    "lib": ["esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "commonjs",
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["src/*"],
+      "modules": ["src/modules/*"],
+      "libs": ["src/libs/*"],
+      "apps": ["src/apps/*"]
+    }
+  }
+}

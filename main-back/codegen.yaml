@@ -1,0 +1,8 @@
+overwrite: true
+schema: "./src/apps/main-gql/infra/gql/type-defs.ts"
+documents: null
+generates:
+  ./src/apps/main-gql/infra/gql/gqlgen-types.ts:
+    plugins:
+      - "typescript"
+      - "typescript-resolvers"

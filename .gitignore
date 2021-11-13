@@ -1,0 +1,21 @@
+node_modules
+deps
+*.log
+.env
+build
+coverage
+
+.idea
+*.iml
+
+.DS_Store
+
+.vscode
+*.pyc
+
+devspace.yaml
+
+# Generated
+gqlgen-types.ts
+schemats-schema.ts
+hschema.graphql

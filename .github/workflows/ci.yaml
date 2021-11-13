@@ -1,0 +1,79 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+      - deploy
+  pull_request:
+    branches:
+      - main
+      - deploy
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Install dependencies
+        run: yarn
+      - name: Check code formatting with Prettier
+        run: yarn prettier:check
+      - name: Check code with ESLint
+        run: yarn lint:check
+
+  test:
+    needs: lint
+    strategy:
+      matrix:
+        app:
+          - main-back
+    runs-on: ubuntu-latest
+    env:
+      MAIN_DB_CONNECTION_STRING: ${{ secrets.MAIN_DB_CONNECTION_STRING }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Install modules
+        run: cd ${{ matrix.app }} && NOYARNPOSTINSTALL=1 yarn
+      - name: Introspect DB
+        run: cd ${{ matrix.app }} && yarn db:intro:withoutenv
+      - name: Run tests
+        run: cd ${{ matrix.app }} && yarn test
+
+  build-and-deploy:
+    if: github.ref == 'refs/heads/deploy'
+    needs:
+      - lint
+      - test
+    strategy:
+      matrix:
+        app:
+          - main-back
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to heroku
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
+          appdir: ${{ matrix.app }}
+
+  success:
+    needs:
+      - lint
+      - test
+      - build-and-deploy
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: echo "Done"

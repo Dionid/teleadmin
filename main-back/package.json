@@ -1,0 +1,96 @@
+{
+  "name": "teleadmin",
+  "version": "0.0.1",
+  "description": "",
+  "license": "UNLICENSED",
+  "main": "build/apps/main-gql/index.js",
+  "devDependencies": {
+    "@graphql-codegen/cli": "^1.21.6",
+    "@graphql-codegen/introspection": "^1.18.2",
+    "@graphql-codegen/typescript": "^1.22.4",
+    "@graphql-codegen/typescript-resolvers": "^1.19.5",
+    "@types/cron": "^1.7.3",
+    "@types/jest": "^26.0.23",
+    "@types/node": "^15.12.4",
+    "@types/node-fetch": "^2.5.11",
+    "@types/prompt": "^1.1.1",
+    "@types/uuid": "^8.3.0",
+    "env-cmd": "^10.1.0",
+    "hasura-cli": "^2.0.9",
+    "jest": "^27.0.6",
+    "jest-mock-extended": "^2.0.4",
+    "rimraf": "^3.0.2",
+    "schemats": "^3.0.3",
+    "testcontainers": "^7.13.0",
+    "ts-jest": "^27.0.3",
+    "ts-mockito": "^2.6.1",
+    "ts-node-dev": "^1.1.6",
+    "typescript": "^4.3.4"
+  },
+  "dependencies": {
+    "abort-controller-x": "^0.2.6",
+    "apollo-server": "^3.4.0",
+    "cron": "^1.8.2",
+    "dotenv": "^10.0.0",
+    "fdd-ts": "^0.0.2",
+    "fp-ts": "^2.11.5",
+    "functional-oriented-programming-ts": "^0.0.10",
+    "graphql": "^15.6.1",
+    "graphql-import-node": "^0.0.4",
+    "graphql-tools": "^8.2.0",
+    "isomorphic-fetch": "^3.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.95.11",
+    "node-abort-controller": "^2.0.0",
+    "node-fetch": "^2.6.1",
+    "pg": "^8.7.1",
+    "telegram": "^1.9.6",
+    "tslib": "^2.3.0",
+    "winston": "^3.3.3"
+  },
+  "scripts": {
+    "start": "NODE_PATH=./build node build/apps/main-gql/index.js",
+    "postinstall": "test -n \"$NOYARNPOSTINSTALL\" || npm run postinstall:script",
+    "postinstall:script": "npm run db:intro:withoutenv && npm run build",
+    "test": "jest --passWithNoTests",
+    "gql:gen": "graphql-codegen --config codegen.yaml",
+    "db:intro:withoutenv": "NODE_TLS_REJECT_UNAUTHORIZED=0 schemats generate -C --config ./src/libs/main-db/schemats.js -o ./src/libs/main-db/schemats-schema.ts",
+    "db:intro": "NODE_TLS_REJECT_UNAUTHORIZED=0 env-cmd -f ./.env schemats generate -C --config ./src/libs/main-db/schemats.js -o ./src/libs/main-db/schemats-schema.ts",
+    "build": "rimraf build && tsc -P tsconfig.build.json",
+    "build:full": "npm run db:intro && npm run gql:gen && npm run build",
+    "dev:mgql": "npm run build:full && NODE_PATH=./build node build/apps/main-gql/index.js",
+    "dev:mgql:light": "npm run build && NODE_PATH=./build node build/apps/main-gql/index.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.ts$",
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
+    "moduleNameMapper": {
+      "^modules/(.*)$": "<rootDir>/src/modules/$1",
+      "^apps/(.*)$": "<rootDir>/src/apps/$1",
+      "^libs/(.*)$": "<rootDir>/src/libs/$1"
+    },
+    "preset": "ts-jest",
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "lcov",
+      "text"
+    ],
+    "globals": {
+      "ts-jest": {
+        "diagnostics": true
+      }
+    }
+  },
+  "resolutions": {
+    "schemats/pg-promise": "10.5.2"
+  },
+  "engines": {
+    "node": "16.x"
+  }
+}
