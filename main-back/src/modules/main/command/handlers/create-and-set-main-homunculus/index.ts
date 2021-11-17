@@ -1,5 +1,6 @@
 import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { Event, EventBus, EventFactory, FullEvent } from "libs/@fdd/eda";
+import { EventBusService} from "libs/@fdd/eda";
+import {Event, EventFactory, FullEvent} from "libs/@fdd/eda/events";
 import {
   TgHomunculus,
   TgHomunculusDS,
@@ -36,7 +37,7 @@ export type CreateAndSetMasterHomunculusCmdHandler = ReturnType<
 >;
 
 export const CreateAndSetMasterHomunculusCmdHandler =
-  (homunculusDS: TgHomunculusDS, eventBus: EventBus) =>
+  (homunculusDS: TgHomunculusDS, eventBus: EventBusService) =>
   async (cmd: CreateAndSetMasterHomunculusCmd) => {
     // . Check that there is no Homunculus with this phone
     if (await homunculusDS.isExistByPhone(cmd.data.phone)) {

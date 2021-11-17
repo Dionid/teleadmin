@@ -1,16 +1,17 @@
 import { initCronJobs } from "apps/main-gql/cron";
-import * as EBP from "apps/main-gql/event-bus-persistor";
+import { EventBusPersistorService} from "apps/main-gql/event-bus-persistor";
 import { initServer } from "apps/main-gql/server";
 import { initTgClient } from "apps/main-gql/set-tg-client";
 import { subscribeOnEvents } from "apps/main-gql/subs";
 import * as dotenv from "dotenv";
-import { getEnvOrThrow } from "fdd-ts";
+import {getEnvOrThrow} from "fdd-ts";
 import knex from "knex";
-import { EventBusInMemory } from "libs/@fdd/eda/inmemory";
+import { EventBusInMemoryService} from "libs/@fdd/eda-inmemory";
 import { NotFoundError } from "libs/@fdd/errors";
 import { knexSnakeCaseMappers } from "libs/@fdd/knex/snakecase";
 import { initOrchestrator } from "modules/orchestrator";
 import winston from "winston";
+
 
 dotenv.config();
 
@@ -67,13 +68,13 @@ const main = async () => {
   });
 
   // . EDA
-  const eventBusPersistor = EBP.make(pg);
+  const eventBusPersistorService = EventBusPersistorService.new({
+    knex: pg
+  });
 
   // . EDA
-  const eventBus = EventBusInMemory({
-    persistor: {
-      saveEvent: EBP.saveEvent(eventBusPersistor),
-    },
+  const eventBus = EventBusInMemoryService.new({
+    persistor: eventBusPersistorService,
     tx: false,
     onError: (e) => {
       logger.error(e);
@@ -87,7 +88,7 @@ const main = async () => {
     pg,
     logger,
     telegramClientRef,
-    eventBus
+    eventBus,
   );
 
   // . INTERNAL SUBSCRIBE

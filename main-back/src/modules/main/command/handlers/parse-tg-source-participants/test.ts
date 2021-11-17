@@ -1,6 +1,6 @@
 import { BigInteger } from "big-integer";
 import { mock, MockProxy } from "jest-mock-extended";
-import { EventBus } from "libs/@fdd/eda";
+import { EventBusService} from "libs/@fdd/eda";
 import { checkIfMeIsChannelAdmin } from "libs/telegram-js/check-if-me-is-channel-admin";
 import { getAllChannelParticipants } from "libs/telegram-js/get-channel-partisipants";
 import {
@@ -57,7 +57,7 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
   let client: {
     ref: MockProxy<TelegramClient>;
   };
-  let eventBus: MockProxy<EventBus>;
+  let eventBus: MockProxy<EventBusService>;
   let tgUserDS: MockProxy<TgUserDS>;
   let tgSourceParticipantDS: MockProxy<TgSourceParticipantDS>;
   let tgSourceDS: MockProxy<TgSourceDS>;
@@ -70,7 +70,7 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
     client = {
       ref: mock<TelegramClient>(),
     };
-    eventBus = mock<EventBus>();
+    eventBus = mock<EventBusService>();
     tgUserDS = mock<TgUserDS>();
     tgSourceParticipantDS = mock<TgSourceParticipantDS>();
     tgSourceDS = mock<TgSourceDS>();

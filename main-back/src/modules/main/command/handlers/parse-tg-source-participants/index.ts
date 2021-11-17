@@ -1,5 +1,6 @@
 import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { EventBus, FullEvent } from "libs/@fdd/eda";
+import { EventBusService} from "libs/@fdd/eda";
+import {FullEvent} from "libs/@fdd/eda/events";
 import { InternalError, NotFoundError } from "libs/@fdd/errors";
 import { checkIfMeIsChannelAdmin } from "libs/telegram-js/check-if-me-is-channel-admin";
 import { TelegramClientRef } from "libs/telegram-js/client";
@@ -57,7 +58,7 @@ export const ParseTgSourceParticipantsCmdHandler =
   (
     logger: Logger,
     client: TelegramClientRef,
-    eventBus: EventBus,
+    eventBus: EventBusService,
     tgUserDS: TgUserDS,
     tgSourceParticipantDS: TgSourceParticipantDS,
     tgSourceDS: TgSourceDS,

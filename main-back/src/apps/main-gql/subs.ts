@@ -1,7 +1,8 @@
 import { TgClientConnectedEvent } from "apps/main-gql/set-tg-client";
 import { CronJob } from "cron";
 import { Knex } from "knex";
-import { Event, EventBus, EventFactory } from "libs/@fdd/eda";
+import { EventBusService} from "libs/@fdd/eda";
+import {Event, EventFactory} from "libs/@fdd/eda/events";
 import { NotFoundError } from "libs/@fdd/errors";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import {
@@ -24,7 +25,7 @@ export const CronSourcesParsingCompletedEvent =
 
 export const subscribeOnEvents = (
   logger: Logger,
-  eventBus: EventBus,
+  eventBus: EventBusService,
   knex: Knex,
   setTgClient: () => void,
   clientRef: TelegramClientRef,

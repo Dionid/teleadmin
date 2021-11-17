@@ -1,17 +1,15 @@
 import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { EventBus } from "libs/@fdd/eda";
+import {EventBusService} from "libs/@fdd/eda";
 import { NotFoundError } from "libs/@fdd/errors";
 import { NotEmptyString } from "libs/@fdd/nominal/common";
 import { AuthTokenToHomunculusSet } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
-import {TgHomunculusDS} from "modules/main/command/projections/tg-homunculus-s/ds";
+import {TgHomunculusDS, TgHomunculusPhone} from "modules/main/command/projections/tg-homunculus";
 import { v4 } from "uuid";
-
-import * as TgHomunculus from "../../projections/tg-homunculus-s";
 
 export type SetAuthTokenToHomunculusCmd = Command<
   "SetAuthTokenToHomunculusCmd",
   {
-    phone: TgHomunculus.TgHomunculusPhone;
+    phone: TgHomunculusPhone;
     authToken: NotEmptyString;
   }
 >;
@@ -20,12 +18,12 @@ export const SetAuthTokenToHomunculusCmd =
 
 export const SetAuthTokenToHomunculusCmdHandler =
   (
-    ds: TgHomunculusDS,
-    eventBus: EventBus,
+    tgHomunculusDS: TgHomunculusDS,
+    eventBus: EventBusService,
   ) =>
   async (cmd: SetAuthTokenToHomunculusCmd) => {
     // . Find Homunculus by phone
-    const homunculus = await TgHomunculusDS.getByPhone(ds)(cmd.data.phone);
+    const homunculus = await tgHomunculusDS.getByPhone(cmd.data.phone);
 
     if (!homunculus) {
       throw new NotFoundError(
@@ -37,7 +35,7 @@ export const SetAuthTokenToHomunculusCmdHandler =
     homunculus.authToken = cmd.data.authToken;
 
     // . Update Homunculus
-    await TgHomunculusDS.update(ds)(homunculus);
+    await tgHomunculusDS.update(homunculus);
 
     // . Send Event
     const event: AuthTokenToHomunculusSet = {

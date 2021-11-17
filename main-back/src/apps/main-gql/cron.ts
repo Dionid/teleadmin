@@ -1,7 +1,8 @@
 import { CronSourcesParsingCompletedEvent } from "apps/main-gql/subs";
 import { CronJob } from "cron";
 import { Knex } from "knex";
-import { EventBus, FullEvent } from "libs/@fdd/eda";
+import { EventBusService} from "libs/@fdd/eda";
+import {FullEvent} from "libs/@fdd/eda/events";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import {
   ParseTgSourceParticipantsCmd,
@@ -18,7 +19,7 @@ export const initCronJobs = (
   knex: Knex,
   logger: Logger,
   telegramClientRef: TelegramClientRef,
-  eventBus: EventBus
+  eventBus: EventBusService,
 ) => {
   const parseSourcesJob = new CronJob("5 0 * * *", async () => {
     const sources = await TgSourceDS(knex).findAllNotDeleted();
@@ -53,12 +54,14 @@ export const initCronJobs = (
         });
       })
     );
-    eventBus.publish([
-      FullEvent.fromEvent({
-        event: CronSourcesParsingCompletedEvent.new({}),
-        userId: null, // TODO. Change to server userid
-      }),
-    ]);
+    await eventBus.publish(
+      [
+        FullEvent.fromEvent({
+          event: CronSourcesParsingCompletedEvent.new({}),
+          userId: null, // TODO. Change to server userid
+        }),
+      ]
+    )
   });
 
   logger.info(`Cron jobs setted up`);

@@ -1,5 +1,6 @@
 import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { EventBus, FullEvent } from "libs/@fdd/eda";
+import { EventBusService} from "libs/@fdd/eda";
+import {FullEvent} from "libs/@fdd/eda/events";
 import { PublicError, returnOnThrow } from "libs/@fdd/errors";
 import { NotEmptyString } from "libs/@fdd/nominal/common";
 import { TelegramClientRef } from "libs/telegram-js/client";
@@ -45,7 +46,7 @@ const getChannelTitle = (channelResultOrErr: ChatFull): string => {
 const sourceWasDeleted = async (
   client: TelegramClientRef,
   tgSourceDS: TgSourceDS,
-  eventBus: EventBus,
+  eventBus: EventBusService,
   cmd: AddPublicSourceCmd,
   source: TgSource
 ) => {
@@ -105,7 +106,7 @@ const sourceWasDeleted = async (
 const sourceIsNew = async (
   client: TelegramClientRef,
   tgSourceDS: TgSourceDS,
-  eventBus: EventBus,
+  eventBus: EventBusService,
   cmd: AddPublicSourceCmd
 ) => {
   // . Join channel
@@ -166,7 +167,7 @@ const sourceIsNew = async (
 };
 
 export const AddPublicSourceCmdHandler =
-  (client: TelegramClientRef, eventBus: EventBus, tgSourceDS: TgSourceDS) =>
+  (client: TelegramClientRef, eventBus: EventBusService, tgSourceDS: TgSourceDS) =>
   async (cmd: AddPublicSourceCmd) => {
     // . Check if source like that doesn't exist
     const source = await tgSourceDS.findByName(cmd.data.sourceName);

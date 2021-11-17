@@ -1,48 +1,48 @@
-import {Event, EventHandler, FullEvent} from "libs/@fdd/eda/index";
+import {Event, EventHandler, FullEvent} from "libs/@fdd/eda/events";
 
-export type EventBusData = { readonly EBD: unique symbol }
+export type EventBus = { readonly EBD: unique symbol }
 
-export type unsubscribe<EBD extends EventBusData = EventBusData> = <E extends Event<any, any, any>>(
+export type unsubscribe<EBD extends EventBus = EventBus> = <E extends Event<any, any, any>>(
   ebd: EBD,
   eventName: E["type"],
   eventHandler: EventHandler<FullEvent<E>>
 ) => Promise<EBD>
 
-export type unsubscribeC<EBD extends EventBusData = EventBusData> = <E extends Event<any, any, any>>(
+export type unsubscribeC<EBD extends EventBus = EventBus> = <E extends Event<any, any, any>>(
   eventName: E["type"],
   eventHandler: EventHandler<FullEvent<E>>
 ) => (ebd: EBD) => Promise<EBD>
 
-export type subscribe<EBD extends EventBusData = EventBusData> = <E extends Event<any, any, any>>(
+export type subscribe<EBD extends EventBus = EventBus> = <E extends Event<any, any, any>>(
   ebd: EBD,
   eventName: E["type"],
   eventHandler: EventHandler<FullEvent<E>>
 ) => Promise<EBD>
 
-export type subscribeC<EBD extends EventBusData = EventBusData> = <E extends Event<any, any, any>>(
+export type subscribeC<EBD extends EventBus = EventBus> = <E extends Event<any, any, any>>(
   eventName: E["type"],
   eventHandler: EventHandler<FullEvent<E>>
 ) => (ebd: EBD) => Promise<EBD>
 
-export type publish<EBD extends EventBusData = EventBusData> = (ebd: EBD, events: readonly FullEvent[]) => Promise<void>
+export type publish<EBD extends EventBus = EventBus> = (ebd: EBD, events: readonly FullEvent[]) => Promise<void>
 
-export type publishC<EBD extends EventBusData = EventBusData> = (events: readonly FullEvent[]) => (ebd: EBD) => Promise<void>
+export type publishC<EBD extends EventBus = EventBus> = (events: readonly FullEvent[]) => (ebd: EBD) => Promise<void>
 
-export type pull<EBD extends EventBusData = EventBusData> = <E extends Event<any, any, any>>(ebd: EBD, eventName: E["type"]) => Promise<E>
+export type pull<EBD extends EventBus = EventBus> = <E extends Event<any, any, any>>(ebd: EBD, eventName: E["type"]) => Promise<E>
 
-export type pullC<EBD extends EventBusData = EventBusData> = <E extends Event<any, any, any>>(eventName: E["type"]) => (ebd: EBD) => Promise<E>
+export type pullC<EBD extends EventBus = EventBus> = <E extends Event<any, any, any>>(eventName: E["type"]) => (ebd: EBD) => Promise<E>
 
-export type observe<EBD extends EventBusData = EventBusData> = <E extends Event<any, any, any>>(ebd: EBD, eventName: E["type"]) => AsyncGenerator<{ stop: () => void; data: E }, void, unknown>
+export type observe<EBD extends EventBus = EventBus> = <E extends Event<any, any, any>>(ebd: EBD, eventName: E["type"]) => AsyncGenerator<{ stop: () => void; data: E }, void, unknown>
 
-export type observeC<EBD extends EventBusData = EventBusData> = <E extends Event<any, any, any>>(eventName: E["type"]) => (ebd: EBD) => AsyncGenerator<{ stop: () => void; data: E }, void, unknown>
+export type observeC<EBD extends EventBus = EventBus> = <E extends Event<any, any, any>>(eventName: E["type"]) => (ebd: EBD) => AsyncGenerator<{ stop: () => void; data: E }, void, unknown>
 
-export type tx<EBD extends EventBusData = EventBusData> = (ebd: EBD) => Promise<EBD>
+export type tx<EBD extends EventBus = EventBus> = (ebd: EBD) => Promise<EBD>
 
-export type commit<EBD extends EventBusData = EventBusData> = (ebd: EBD) => Promise<EBD>
+export type commit<EBD extends EventBus = EventBus> = (ebd: EBD) => Promise<EBD>
 
-export type rollback<EBD extends EventBusData = EventBusData> = (ebd: EBD) => Promise<EBD>
+export type rollback<EBD extends EventBus = EventBus> = (ebd: EBD) => Promise<EBD>
 
-export type EventBusBehaviour<EBD extends EventBusData = EventBusData> = {
+export type Behaviour<EBD extends EventBus = EventBus> = {
   unsubscribe: unsubscribe<EBD>
   unsubscribeC: unsubscribeC<EBD>
   subscribe: subscribe<EBD>,
@@ -58,19 +58,19 @@ export type EventBusBehaviour<EBD extends EventBusData = EventBusData> = {
   rollback: rollback<EBD>,
 }
 
-export type EventBusService = {
+export type Service = {
   unsubscribe<E extends Event<any, any, any>>(
     eventName: E["type"],
     eventHandler: EventHandler<FullEvent<E>>
-  ): Promise<EventBusService>
+  ): Promise<Service>
   subscribe<E extends Event<any, any, any>>(
     eventName: E["type"],
     eventHandler: EventHandler<FullEvent<E>>
-  ): Promise<EventBusService>,
+  ): Promise<Service>,
   publish(events: readonly FullEvent[]): Promise<void>;
   pull<E extends Event<any, any, any>>(eventName: E["type"]): Promise<E>
   observe <E extends Event<any, any, any>>(eventName: E["type"]): AsyncGenerator<{ stop: () => void; data: E }, void, unknown>
-  tx(): Promise<EventBusService>
-  commit(): Promise<EventBusService>
-  rollback(): Promise<EventBusService>
+  tx(): Promise<Service>
+  commit(): Promise<Service>
+  rollback(): Promise<Service>
 }

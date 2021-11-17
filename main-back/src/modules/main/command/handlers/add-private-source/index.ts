@@ -1,6 +1,7 @@
 import { pipeAsync } from "functional-oriented-programming-ts";
 import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { Event, EventBus, FullEvent } from "libs/@fdd/eda";
+import { EventBusService} from "libs/@fdd/eda";
+import {Event, FullEvent} from "libs/@fdd/eda/events";
 import { PublicError, throwOnError } from "libs/@fdd/errors";
 import { NotEmptyString } from "libs/@fdd/nominal/common";
 import { TelegramClientRef } from "libs/telegram-js/client";
@@ -125,7 +126,7 @@ const throwOnJoinChannelError = (resultOrErr: Api.TypeUpdate | Error) => {
 
 // . ATTENTION! There is 2 versions of logic, just for demo purpose
 export const AddPrivateSourceCmdHandler =
-  (client: TelegramClientRef, eventBus: EventBus, tgSourceDS: TgSourceDS) =>
+  (client: TelegramClientRef, eventBus: EventBusService, tgSourceDS: TgSourceDS) =>
   async (cmd: AddPrivateSourceCmd) => {
     // .1. Pipe version
     await pipeAsync(

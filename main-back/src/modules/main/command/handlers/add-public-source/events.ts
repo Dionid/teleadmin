@@ -1,4 +1,4 @@
-import { Event, EventFactory } from "libs/@fdd/eda";
+import {Event, EventFactory} from "libs/@fdd/eda/events";
 import {
   TgSourceId,
   TgSourceTgId,

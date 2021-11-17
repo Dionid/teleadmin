@@ -1,5 +1,6 @@
 import { Knex } from "knex";
-import { Event, EventBus, FullEvent } from "libs/@fdd/eda";
+import { EventBusService} from "libs/@fdd/eda";
+import {Event, FullEvent} from "libs/@fdd/eda/events";
 import { CriticalError } from "libs/@fdd/errors";
 import { NotEmptyString } from "libs/@fdd/nominal/common";
 import { TgApplicationTable } from "libs/main-db/models";
@@ -27,7 +28,7 @@ export type HomunculusPhoneCodeReceived = Event<
 
 export const initCreatedAndSettedMasterHomunculusEventHandler = (
   logger: Logger,
-  eventBus: EventBus,
+  eventBus: EventBusService,
   knex: Knex
 ) => {
   eventBus.subscribe<CreatedAndSettedMasterHomunculusEvent>(

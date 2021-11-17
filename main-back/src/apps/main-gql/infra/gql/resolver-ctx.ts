@@ -1,7 +1,7 @@
 import { Maybe } from "functional-oriented-programming-ts";
 import { Knex } from "knex";
 import { CommandHandler } from "libs/@fdd/cqrs";
-import { EventBus } from "libs/@fdd/eda";
+import { EventBusService} from "libs/@fdd/eda";
 import { AuthenticateCmdHandler } from "modules/ia/command/handlers/authenticate";
 import { CreateFirstAdminCmdHandler } from "modules/ia/command/handlers/create-first-admin";
 import { CreateUserCmdHandler } from "modules/ia/command/handlers/create-user";
@@ -15,7 +15,7 @@ import { ParseTgSourceParticipantsCmd } from "modules/main/command/handlers/pars
 
 export type ResolversCtx = {
   tx: Knex.Transaction;
-  eventBus: EventBus;
+  eventBus: EventBusService;
   userId: Maybe<UserId>;
   modules: {
     main: {

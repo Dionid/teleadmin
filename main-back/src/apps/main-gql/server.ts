@@ -5,7 +5,7 @@ import { schema } from "apps/main-gql/infra/gql/shema";
 import { Maybe, pipeAsync } from "functional-oriented-programming-ts";
 import { GraphQLError } from "graphql";
 import { Knex } from "knex";
-import { EventBus } from "libs/@fdd/eda";
+import { EventBusService} from "libs/@fdd/eda";
 import { InternalError, PermissionDeniedError } from "libs/@fdd/errors";
 import { UserTable } from "libs/main-db/models";
 import { JWTToken } from "libs/teleadmin/jwt-token";
@@ -33,7 +33,7 @@ import { Logger } from "winston";
 
 export const initServer = (
   logger: Logger,
-  eventBus: EventBus,
+  eventBus: EventBusService,
   knex: Knex,
   telegramClient: TelegramClientRef,
   jwtSecret: string,
@@ -69,7 +69,7 @@ export const initServer = (
       }
 
       // . EDA
-      const txEventBus = eventBus.tx();
+      const txEventBus = await eventBus.tx();
 
       // . DS
       const tgApplicationDS = TgApplicationDS(tx);
@@ -133,7 +133,7 @@ export const initServer = (
       );
       const leaveAndDeleteSourceCmdHandler = pipeAsync(
         isAuthenticatedAndNotDemoAspect,
-        LeaveAndDeleteSourceCmdHandler(telegramClient, txEventBus, tgSourceDS)
+        LeaveAndDeleteSourceCmdHandler(telegramClient, tgSourceDS)
       );
 
       return {
@@ -186,7 +186,7 @@ export const initServer = (
                 logger.debug("COMMITTING");
                 await ctx.context.tx.commit();
                 logger.debug("COMMITTED");
-                ctx.context.eventBus.commit();
+                await ctx.context.eventBus.commit();
               } catch (e) {
                 logger.error(e);
                 throw e;
@@ -197,7 +197,7 @@ export const initServer = (
                 logger.debug("ROLLING");
                 await ctx.context.tx.rollback();
                 logger.debug("ROLLED");
-                ctx.context.eventBus.rollback();
+                await ctx.context.eventBus.rollback();
               } catch (e) {
                 logger.error(e);
                 throw e;
