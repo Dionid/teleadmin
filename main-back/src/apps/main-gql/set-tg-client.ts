@@ -11,7 +11,7 @@ export type TgClientConnectedEvent = Event<
   "v1",
   Record<any, any>
 >;
-export const TgClientConnectedEvent = EventFactory<TgClientConnectedEvent>(
+export const TgClientConnectedEvent = EventFactory.new<TgClientConnectedEvent>(
   "TgClientConnectedEvent",
   "v1"
 );

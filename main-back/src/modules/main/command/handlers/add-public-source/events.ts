@@ -14,7 +14,7 @@ export type PublicSourceAddedEvent = Event<
     wasDeleted: boolean;
   }
 >;
-export const PublicSourceAddedEvent = EventFactory<PublicSourceAddedEvent>(
+export const PublicSourceAddedEvent = EventFactory.new<PublicSourceAddedEvent>(
   "PublicSourceAdded",
   "v1.1"
 );

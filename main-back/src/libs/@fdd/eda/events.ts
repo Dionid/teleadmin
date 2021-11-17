@@ -86,20 +86,8 @@ export type EventFactory<E extends Event<any, any, any>> = {
   isFull: (e: FullEvent) => e is FullEvent<E>;
 };
 
-export function EventFactory<E extends Event<any, any, any>>(
-  type: E["type"],
-  version: E["version"]
-): EventFactory<E>;
-export function EventFactory<E extends Event<any, any, any>,
-  AdditionalFns extends Record<string, any>>(
-  type: E["type"],
-  version: E["version"],
-  additionalFns: AdditionalFns
-): EventFactory<E> & AdditionalFns;
-
-export function EventFactory<E extends Event<any, any, any>,
-  AdditionalFns extends Record<string, any>>(type: E["type"], version: E["version"], additionalFns?: AdditionalFns) {
-  const fns = {
+export const newEventFactory = <E extends Event<any, any, any>>(type: E["type"], version: E["version"]): EventFactory<E> => {
+  return {
     new: (data: E["data"]): E => {
       return {
         type,
@@ -116,15 +104,10 @@ export function EventFactory<E extends Event<any, any, any>,
       return e.type === type;
     },
   };
+}
 
-  if (additionalFns !== undefined) {
-    return {
-      ...fns,
-      ...additionalFns,
-    };
-  }
-
-  return fns;
+export const EventFactory = {
+  new: newEventFactory,
 }
 
 export type EventHandler<E extends FullEvent<any>> = (

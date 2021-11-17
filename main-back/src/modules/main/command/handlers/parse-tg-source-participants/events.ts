@@ -6,7 +6,7 @@ export type TgSourceParticipantsParsedEvent = Event<
   Record<any, any>
 >;
 export const TgSourceParticipantsParsedEvent =
-  EventFactory<TgSourceParticipantsParsedEvent>(
+  EventFactory.new<TgSourceParticipantsParsedEvent>(
     "TgSourceParticipantsParsedEvent",
     "v1"
   );

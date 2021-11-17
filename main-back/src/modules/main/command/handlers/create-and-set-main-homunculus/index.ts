@@ -16,7 +16,7 @@ export type CreatedAndSettedMasterHomunculusEvent = Event<
   }
 >;
 export const CreatedAndSettedMasterHomunculusEvent =
-  EventFactory<CreatedAndSettedMasterHomunculusEvent>(
+  EventFactory.new<CreatedAndSettedMasterHomunculusEvent>(
     "CreatedAndSettedMasterHomunculusEvent",
     "v1"
   );

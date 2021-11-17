@@ -18,7 +18,7 @@ export type CronSourcesParsingCompletedEvent = Event<
   Record<any, any>
 >;
 export const CronSourcesParsingCompletedEvent =
-  EventFactory<CronSourcesParsingCompletedEvent>(
+  EventFactory.new<CronSourcesParsingCompletedEvent>(
     "CronSourcesParsingCompletedEvent",
     "v1"
   );

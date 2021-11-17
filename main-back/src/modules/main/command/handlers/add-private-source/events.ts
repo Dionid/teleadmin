@@ -27,7 +27,14 @@ const additionalFns = {
   },
 };
 
-export const PrivateSourceAddedEvent = EventFactory<
-  PrivateSourceAddedEvent,
-  typeof additionalFns
->("PrivateSourceAdded", "v1", additionalFns);
+export const PrivateSourceAddedEvent = {
+  ...EventFactory.new<PrivateSourceAddedEvent>("PrivateSourceAdded", "v1"),
+  fromTgSource: (tgSource: TgSource, wasDeleted: boolean) => {
+    return PrivateSourceAddedEvent.new({
+      id: tgSource.id,
+      tgId: tgSource.tgId,
+      tgName: tgSource.tgName,
+      wasDeleted,
+    });
+  },
+}
