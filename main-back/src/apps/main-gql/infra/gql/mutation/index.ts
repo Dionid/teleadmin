@@ -1,6 +1,6 @@
 import { MutationResolvers } from "apps/main-gql/infra/gql/gqlgen-types";
 import { ResolversCtx } from "apps/main-gql/infra/gql/resolver-ctx";
-import { NotEmptyString } from "libs/@fdd/branded/common";
+import { NotEmptyString } from "functional-oriented-programming-ts/branded";
 import { TgSourceInviteLinkHash } from "libs/telegram-js/types";
 import { AuthenticateCmd } from "modules/ia/command/handlers/authenticate";
 import { CreateFirstAdminCmd } from "modules/ia/command/handlers/create-first-admin";

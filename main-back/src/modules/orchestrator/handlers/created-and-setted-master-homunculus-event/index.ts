@@ -1,7 +1,7 @@
 import { EventBusService, Event, FullEvent } from "fdd-ts/eda";
 import { CriticalError } from "fdd-ts/errors";
+import { NotEmptyString } from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { NotEmptyString } from "libs/@fdd/branded/common";
 import { TgApplicationTable } from "libs/main-db/models";
 import { CreatedAndSettedMasterHomunculusEvent } from "modules/main/command/handlers/create-and-set-main-homunculus";
 import {

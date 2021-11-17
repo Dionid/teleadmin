@@ -1,7 +1,7 @@
 import { Command, CommandFactory } from "fdd-ts/cqrs";
 import { EventBusService } from "fdd-ts/eda";
 import { NotFoundError } from "fdd-ts/errors";
-import { NotEmptyString } from "libs/@fdd/branded/common";
+import { NotEmptyString } from "functional-oriented-programming-ts/branded";
 import { AuthTokenToHomunculusSet } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
 import {
   TgHomunculusDS,

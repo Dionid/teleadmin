@@ -1,6 +1,9 @@
+import { UUID } from "fdd-ts/fop-utils";
+import {
+  BrandedPrimitive,
+  NotEmptyString,
+} from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { BrandedPrimitive } from "libs/@fdd/branded";
-import { NotEmptyString, UUID } from "libs/@fdd/branded/common";
 import { TgHomunculusTable } from "libs/main-db/models";
 
 export type TgHomunculusId = BrandedPrimitive<

@@ -1,7 +1,10 @@
+import { UUID } from "fdd-ts/fop-utils";
 import { countMoreThanZero } from "fdd-ts/knex-utils";
+import {
+  BrandedPrimitive,
+  NotEmptyString,
+} from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { BrandedPrimitive } from "libs/@fdd/branded";
-import { NotEmptyString, UUID } from "libs/@fdd/branded/common";
 import { TgApplicationTable } from "libs/main-db/models";
 
 export type TgApplicationId = BrandedPrimitive<

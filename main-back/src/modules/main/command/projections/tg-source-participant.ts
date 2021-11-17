@@ -1,6 +1,6 @@
+import { UUID } from "fdd-ts/fop-utils";
+import { BrandedPrimitive } from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { BrandedPrimitive } from "libs/@fdd/branded";
-import { UUID } from "libs/@fdd/branded/common";
 import {
   TgSourceParticipantStatusTable,
   TgSourceParticipantStatusTableName,

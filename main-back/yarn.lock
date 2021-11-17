@@ -3592,15 +3592,15 @@ function-bind@^1.1.1:
   resolved "https://registry.npmjs.org/function-bind/-/function-bind-1.1.1.tgz"
   integrity sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==
 
-functional-oriented-programming-ts@^0.0.10:
-  version "0.0.10"
-  resolved "https://registry.npmjs.org/functional-oriented-programming-ts/-/functional-oriented-programming-ts-0.0.10.tgz"
-  integrity sha512-6pt9MxxypS52OIji6A5yc+B8PoxdRReJ3B+FJD9MY8LvZElZdZESxwqp2Ffqdp0S1xbgBSPrYN2igUhBl2olYg==
-
 functional-oriented-programming-ts@^0.0.12:
   version "0.0.12"
   resolved "https://registry.yarnpkg.com/functional-oriented-programming-ts/-/functional-oriented-programming-ts-0.0.12.tgz#e181c4cbb66e74aa3b68bb3cb3158444cbac7751"
   integrity sha512-B6fQGnhC4YYX6mBQAib1g7XTM91EFFyF1+OomClMEkN9MLuLPRehqe7G3E/lXyYrboNmhP4dZigY9MiLn18Ksg==
+
+functional-oriented-programming-ts@^0.0.13:
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/functional-oriented-programming-ts/-/functional-oriented-programming-ts-0.0.13.tgz#0352806baa156631c04b1dfe51247f06d35625bd"
+  integrity sha512-rc5cCrgbUAaN6lVMWxjh/D48O5EsZNqh0yy4PerKTqHn1nXsgJMvT+HmnNklTZnkZEQ90wjceU5KuAM8d5V54w==
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"

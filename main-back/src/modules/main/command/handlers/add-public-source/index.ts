@@ -2,7 +2,7 @@ import { Command, CommandFactory } from "fdd-ts/cqrs";
 import { EventBusService } from "fdd-ts/eda";
 import { FullEvent } from "fdd-ts/eda/events";
 import { PublicError, returnOnThrow } from "fdd-ts/errors";
-import { NotEmptyString } from "libs/@fdd/branded/common";
+import { NotEmptyString } from "functional-oriented-programming-ts/branded";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import { PublicSourceAddedEvent } from "modules/main/command/handlers/add-public-source/events";
 import {

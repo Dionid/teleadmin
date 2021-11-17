@@ -3,7 +3,7 @@ import { EventBusService } from "fdd-ts/eda";
 import { Event, FullEvent } from "fdd-ts/eda/events";
 import { PublicError, throwOnError } from "fdd-ts/errors";
 import { pipeAsync } from "functional-oriented-programming-ts";
-import { NotEmptyString } from "libs/@fdd/branded/common";
+import { NotEmptyString } from "functional-oriented-programming-ts/branded";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import { getGullChannel } from "libs/telegram-js/get-full-channel";
 import { joinChannel } from "libs/telegram-js/join-channel";

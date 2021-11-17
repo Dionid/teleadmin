@@ -1,5 +1,5 @@
 import { Command, CommandFactory } from "fdd-ts/cqrs";
-import { NotEmptyString } from "libs/@fdd/branded/common";
+import { NotEmptyString } from "functional-oriented-programming-ts/branded";
 import {
   TgApplication,
   TgApplicationDS,

@@ -1,9 +1,9 @@
 import * as crypto from "crypto";
 
 import { ValidationError } from "fdd-ts/errors";
+import { UUID } from "fdd-ts/fop-utils";
+import { BrandedPrimitive } from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { BrandedPrimitive } from "libs/@fdd/branded";
-import { UUID } from "libs/@fdd/branded/common";
 import { UserTable } from "libs/main-db/models";
 
 export type UserId = BrandedPrimitive<UUID, { readonly UserId: unique symbol }>;
