@@ -1,53 +1,53 @@
 import {
   EventBusBehaviour,
   EventBus,
-  EventBusService
+  EventBusService,
+  subscribeC,
 } from "libs/@fdd/eda";
 
-import {EventBusInMemory, EventBusInMemoryService} from "./index";
+import { EventBusInMemory, EventBusInMemoryService } from "./index";
 
-const eventBusInmemory = EventBusInMemory.new()
+const eventBusInmemory = EventBusInMemory.new();
 
 const onEventHandler = EventBusInMemory.subscribeC("", async (event) => {
-  return
-})
+  return;
+});
 
-const someFn = (
-  eventBusData: EventBus,
-) => {
-  onEventHandler(eventBusInmemory)
+const someFn = (eventBusData: EventBus) => {
+  onEventHandler(eventBusInmemory);
   EventBusInMemory.subscribeC("", async (event) => {
-    return
-  })(eventBusInmemory)
-}
+    return;
+  })(eventBusInmemory);
+};
 
-someFn(
-  eventBusInmemory,
-)
+someFn(eventBusInmemory);
 
 const someFnS = <EBD extends EventBus>(
   eventBusD: EBD,
-  eventBusB: EventBusBehaviour<EBD>,
+  eventBusB: EventBusBehaviour<EBD>
 ) => {
   eventBusB.subscribeC("", async (event) => {
-    return
-  })(eventBusD)
-}
+    return;
+  })(eventBusD);
+};
 
-someFnS(
-  eventBusInmemory,
-  EventBusInMemory,
-)
+someFnS(eventBusInmemory, EventBusInMemory);
 
-const someFnT = (
-  eventBusService: EventBusService,
+const someFnT = (eventBusService: EventBusService) => {
+  eventBusService.subscribe("", async () => {});
+};
+
+const eventBusInmemoryService = EventBusInMemoryService.new(eventBusInmemory);
+
+someFnT(eventBusInmemoryService);
+
+const someFnF = <EBD extends EventBus>(
+  eventBusD: EBD,
+  sub: subscribeC<EBD>
 ) => {
-  eventBusService.subscribe("", async() => {
+  sub("", async (event) => {
+    return;
+  })(eventBusD);
+};
 
-  })
-}
-
-const eventBusInmemoryService = EventBusInMemoryService.new(eventBusInmemory)
-
-someFnT(eventBusInmemoryService)
-
+someFnF(eventBusInmemory, EventBusInMemory.subscribeC);

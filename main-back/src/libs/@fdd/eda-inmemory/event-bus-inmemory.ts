@@ -1,39 +1,48 @@
-import {Deferred} from "libs/@fdd/deferred";
-import * as EB from "libs/@fdd/eda/event-bus";
-import {Event, EventHandler, FullEvent} from "libs/@fdd/eda/events";
+import { Deferred } from "libs/@fdd/deferred";
+import {
+  Event,
+  EventBus,
+  EventBusService,
+  EventHandler,
+  FullEvent,
+} from "libs/@fdd/eda";
 
-export type Persistor = {
-  saveEvent: <E extends FullEvent>(event: E) => Promise<E>
-}
+export type EventBusInMemoryPersistor = {
+  saveEvent: <E extends FullEvent>(event: E) => Promise<E>;
+};
 
-export type EventBusInMemory = EB.EventBus & {
-  tx: boolean
-  storedEvents: FullEvent[]
-  eventHandlers: Record<string, Array<EventHandler<any>>>
-  onError: (e: any) => void
-  persistor?: Persistor
-  log?: (...args: any) => void
-}
+export type EventBusInMemory = EventBus & {
+  tx: boolean;
+  storedEvents: FullEvent[];
+  eventHandlers: Record<string, Array<EventHandler<any>>>;
+  onError: (e: any) => void;
+  persistor?: EventBusInMemoryPersistor;
+  log?: (...args: any) => void;
+};
 
-export const newEventBusInMemory = (props: {
-  tx?: boolean
-  storedEvents?: FullEvent[]
-  eventHandlers?: Record<string, Array<EventHandler<any>>>
-  persistor?: Persistor,
-  onError?: (e: any) => void;
-  log?: (...args: any) => void
-} = {}): EventBusInMemory => {
+export const newEventBusInMemory = (
+  props: {
+    tx?: boolean;
+    storedEvents?: FullEvent[];
+    eventHandlers?: Record<string, Array<EventHandler<any>>>;
+    persistor?: EventBusInMemoryPersistor;
+    onError?: (e: any) => void;
+    log?: (...args: any) => void;
+  } = {}
+): EventBusInMemory => {
   return {
     tx: props.tx || false,
-    onError: props.onError || ((e) => {
-      throw e
-    }),
+    onError:
+      props.onError ||
+      ((e) => {
+        throw e;
+      }),
     storedEvents: props.storedEvents || [],
     eventHandlers: props.eventHandlers || {},
     persistor: props.persistor,
     log: props.log,
-  } as EventBusInMemory
-}
+  } as EventBusInMemory;
+};
 
 export const unsubscribe = async <E extends Event<any, any, any>>(
   ebps: EventBusInMemory,
@@ -46,15 +55,17 @@ export const unsubscribe = async <E extends Event<any, any, any>>(
     );
   }
 
-  return ebps
-}
+  return ebps;
+};
 
-export const unsubscribeC = <E extends Event<any, any, any>>(
-  eventName: E["type"],
-  eventHandler: EventHandler<FullEvent<E>>
-) => async (ebps: EventBusInMemory): Promise<EventBusInMemory> => {
-  return unsubscribe(ebps, eventName, eventHandler)
-}
+export const unsubscribeC =
+  <E extends Event<any, any, any>>(
+    eventName: E["type"],
+    eventHandler: EventHandler<FullEvent<E>>
+  ) =>
+  async (ebps: EventBusInMemory): Promise<EventBusInMemory> => {
+    return unsubscribe(ebps, eventName, eventHandler);
+  };
 
 export const subscribe = async <E extends Event<any, any, any>>(
   ebps: EventBusInMemory,
@@ -71,89 +82,100 @@ export const subscribe = async <E extends Event<any, any, any>>(
     ...ebps,
     eventHandlers: {
       ...ebps.eventHandlers,
-    }
-  }
-}
+    },
+  };
+};
 
-export const subscribeC = <E extends Event<any, any, any>>(
-  eventName: E["type"],
-  eventHandler: EventHandler<FullEvent<E>>
-) => async (ebps: EventBusInMemory): Promise<EventBusInMemory> => {
-  return subscribe(ebps, eventName, eventHandler)
-}
+export const subscribeC =
+  <E extends Event<any, any, any>>(
+    eventName: E["type"],
+    eventHandler: EventHandler<FullEvent<E>>
+  ) =>
+  async (ebps: EventBusInMemory): Promise<EventBusInMemory> => {
+    return subscribe(ebps, eventName, eventHandler);
+  };
 
-const dispatch = (events: readonly FullEvent[]) => async (ebps: EventBusInMemory) => {
-  await events.map(async (event) => {
-    const handlers = ebps.eventHandlers[event.type];
+const dispatch =
+  (events: readonly FullEvent[]) => async (ebps: EventBusInMemory) => {
+    await events.map(async (event) => {
+      const handlers = ebps.eventHandlers[event.type];
 
-    if (ebps.persistor) {
-      try {
-        await ebps.persistor.saveEvent(event);
-      } catch (e) {
-        ebps.onError(e);
-      }
-    }
-
-    if (handlers) {
-      await handlers.map(async (callback) => {
+      if (ebps.persistor) {
         try {
-          await callback(event);
+          await ebps.persistor.saveEvent(event);
         } catch (e) {
           ebps.onError(e);
         }
-      });
-    }
-  });
-};
+      }
 
-export const publish = async (ebps: EventBusInMemory, events: readonly FullEvent[]): Promise<void> => {
+      if (handlers) {
+        await handlers.map(async (callback) => {
+          try {
+            await callback(event);
+          } catch (e) {
+            ebps.onError(e);
+          }
+        });
+      }
+    });
+  };
+
+export const publish = async (
+  ebps: EventBusInMemory,
+  events: readonly FullEvent[]
+): Promise<void> => {
   if (ebps.tx) {
-    ebps.storedEvents.push(...events)
+    ebps.storedEvents.push(...events);
 
-    return
+    return;
   }
 
-  await dispatch(events)(ebps)
-}
+  await dispatch(events)(ebps);
+};
 
-
-export const publishC = (events: readonly FullEvent[]) => async (ebps: EventBusInMemory): Promise<void> => {
-  return publish(ebps, events)
-}
+export const publishC =
+  (events: readonly FullEvent[]) =>
+  async (ebps: EventBusInMemory): Promise<void> => {
+    return publish(ebps, events);
+  };
 
 export const tx = async (ebps: EventBusInMemory): Promise<EventBusInMemory> => {
   return {
     ...ebps,
     tx: true,
     storedEvents: [],
-  }
-}
+  };
+};
 
-export const commit = async (ebps: EventBusInMemory): Promise<EventBusInMemory> => {
+export const commit = async (
+  ebps: EventBusInMemory
+): Promise<EventBusInMemory> => {
   if (!ebps.tx) {
-    return ebps
+    return ebps;
   }
 
-  await dispatch(ebps.storedEvents)(ebps)
+  await dispatch(ebps.storedEvents)(ebps);
 
   return {
     ...ebps,
     tx: false,
     storedEvents: [],
-  }
-}
+  };
+};
 
-export const rollback = async (ebps: EventBusInMemory): Promise<EventBusInMemory> => {
+export const rollback = async (
+  ebps: EventBusInMemory
+): Promise<EventBusInMemory> => {
   if (!ebps.tx) {
-    return ebps
+    return ebps;
   }
 
   return {
     ...ebps,
     tx: false,
     storedEvents: [],
-  }
-}
+  };
+};
 
 export const pull = async <E extends Event<any, any, any>>(
   ebps: EventBusInMemory,
@@ -163,15 +185,16 @@ export const pull = async <E extends Event<any, any, any>>(
     const callback: EventHandler<FullEvent<E>> = async (event) => {
       resolve(event);
       await unsubscribe(ebps, eventName, callback);
-    }
+    };
 
     subscribe<E>(ebps, eventName, callback);
   });
 };
 
-export const pullC = <E extends Event<any, any, any>>(
-  eventName: E["type"]
-) => (ebps: EventBusInMemory): Promise<E> => pull(ebps, eventName)
+export const pullC =
+  <E extends Event<any, any, any>>(eventName: E["type"]) =>
+  (ebps: EventBusInMemory): Promise<E> =>
+    pull(ebps, eventName);
 
 export async function* observe<E extends Event<any, any, any>>(
   ebps: EventBusInMemory,
@@ -183,7 +206,7 @@ export async function* observe<E extends Event<any, any, any>>(
   const callback: EventHandler<E> = async (e) => {
     deff.resolve(e);
     deff = Deferred.new();
-  }
+  };
 
   await subscribe<E>(ebps, eventName, callback);
 
@@ -199,11 +222,14 @@ export async function* observe<E extends Event<any, any, any>>(
   }
 }
 
-export const observeC = <E extends Event<any, any, any>>(
-  eventName: E["type"]
-) => (ebps: EventBusInMemory): AsyncGenerator<{ stop: () => void; data: E }, void, unknown> => observe(ebps, eventName)
+export const observeC =
+  <E extends Event<any, any, any>>(eventName: E["type"]) =>
+  (
+    ebps: EventBusInMemory
+  ): AsyncGenerator<{ stop: () => void; data: E }, void, unknown> =>
+    observe(ebps, eventName);
 
-export type EventBusInMemoryBehaviour = typeof EventBusInMemory
+export type EventBusInMemoryBehaviour = typeof EventBusInMemory;
 export const EventBusInMemory = {
   new: newEventBusInMemory,
   unsubscribe,
@@ -219,36 +245,46 @@ export const EventBusInMemory = {
   tx,
   commit,
   rollback,
-}
+};
 
-export type Service = EB.Service
-export const Service = {
-  fromEventBusInmemory: (ebps: EventBusInMemory): EB.Service => {
+export type EventBusInMemoryService = EventBusService;
+export const EventBusInMemoryService = {
+  fromEventBusInmemory: (ebps: EventBusInMemory): EventBusService => {
     return {
       unsubscribe: async <E extends Event<any, any, any>>(
         eventName: E["type"],
         eventHandler: EventHandler<FullEvent<E>>
-      ) => Service.new(await unsubscribe(ebps, eventName, eventHandler)),
+      ) =>
+        EventBusInMemoryService.new(
+          await unsubscribe(ebps, eventName, eventHandler)
+        ),
       subscribe: async <E extends Event<any, any, any>>(
         eventName: E["type"],
         eventHandler: EventHandler<FullEvent<E>>
-      ) => Service.new(await subscribe(ebps, eventName, eventHandler)),
+      ) =>
+        EventBusInMemoryService.new(
+          await subscribe(ebps, eventName, eventHandler)
+        ),
       publish: async (events: readonly FullEvent[]) => publish(ebps, events),
-      pull: async <E extends Event<any, any, any>>(eventName: E["type"]) => pull(ebps, eventName),
-      observe: <E extends Event<any, any, any>>(eventName: E["type"]) => observe(ebps, eventName),
-      tx: async () => Service.new(await tx(ebps)),
-      commit: async () => Service.new(await commit(ebps)),
-      rollback: async () => Service.new(await rollback(ebps)),
-    }
+      pull: async <E extends Event<any, any, any>>(eventName: E["type"]) =>
+        pull(ebps, eventName),
+      observe: <E extends Event<any, any, any>>(eventName: E["type"]) =>
+        observe(ebps, eventName),
+      tx: async () => EventBusInMemoryService.new(await tx(ebps)),
+      commit: async () => EventBusInMemoryService.new(await commit(ebps)),
+      rollback: async () => EventBusInMemoryService.new(await rollback(ebps)),
+    };
   },
   new: (props: {
-    tx?: boolean
-    storedEvents?: FullEvent[]
-    eventHandlers?: Record<string, Array<EventHandler<any>>>
-    persistor?: Persistor,
+    tx?: boolean;
+    storedEvents?: FullEvent[];
+    eventHandlers?: Record<string, Array<EventHandler<any>>>;
+    persistor?: EventBusInMemoryPersistor;
     onError?: (e: any) => void;
-    log?: (...args: any) => void
-  }): EB.Service => {
-    return Service.fromEventBusInmemory(newEventBusInMemory(props))
+    log?: (...args: any) => void;
+  }): EventBusService => {
+    return EventBusInMemoryService.fromEventBusInmemory(
+      newEventBusInMemory(props)
+    );
   },
-}
+};
