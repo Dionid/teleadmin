@@ -1,9 +1,9 @@
+import { Command, CommandFactory } from "fdd-ts/cqrs";
+import { EventBusService } from "fdd-ts/eda";
+import { Event, FullEvent } from "fdd-ts/eda/events";
+import { PublicError, throwOnError } from "fdd-ts/errors";
 import { pipeAsync } from "functional-oriented-programming-ts";
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { EventBusService} from "libs/@fdd/eda";
-import {Event, FullEvent} from "libs/@fdd/eda/events";
-import { PublicError, throwOnError } from "libs/@fdd/errors";
-import { NotEmptyString } from "libs/@fdd/nominal/common";
+import { NotEmptyString } from "libs/@fdd/branded/common";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import { getGullChannel } from "libs/telegram-js/get-full-channel";
 import { joinChannel } from "libs/telegram-js/join-channel";
@@ -126,7 +126,11 @@ const throwOnJoinChannelError = (resultOrErr: Api.TypeUpdate | Error) => {
 
 // . ATTENTION! There is 2 versions of logic, just for demo purpose
 export const AddPrivateSourceCmdHandler =
-  (client: TelegramClientRef, eventBus: EventBusService, tgSourceDS: TgSourceDS) =>
+  (
+    client: TelegramClientRef,
+    eventBus: EventBusService,
+    tgSourceDS: TgSourceDS
+  ) =>
   async (cmd: AddPrivateSourceCmd) => {
     // .1. Pipe version
     await pipeAsync(
@@ -134,7 +138,7 @@ export const AddPrivateSourceCmdHandler =
       throwOnJoinChannelError,
       checkThatUpdates,
       getGullChannel(client.ref),
-      (res: ChatFull | Error) => throwOnError()(res),
+      (res: ChatFull | Error) => throwOnError(res),
       createSource(tgSourceDS, cmd.data.sourceType),
       (event: Event<any, any, any>) => [
         FullEvent.fromCmdOrQuery({ event, meta: cmd.meta }),

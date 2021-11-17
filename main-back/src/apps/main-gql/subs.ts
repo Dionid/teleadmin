@@ -1,9 +1,8 @@
 import { TgClientConnectedEvent } from "apps/main-gql/set-tg-client";
 import { CronJob } from "cron";
+import { Event, EventBusService, EventFactory } from "fdd-ts/eda";
+import { NotFoundError } from "fdd-ts/errors";
 import { Knex } from "knex";
-import { EventBusService} from "libs/@fdd/eda";
-import {Event, EventFactory} from "libs/@fdd/eda/events";
-import { NotFoundError } from "libs/@fdd/errors";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import {
   ParseInfoAboutHomunculusCmd,
@@ -12,6 +11,7 @@ import {
 import { AuthTokenToHomunculusSet } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
 import { TgUserDS } from "modules/main/command/projections/tg-user";
 import { Logger } from "winston";
+
 export type CronSourcesParsingCompletedEvent = Event<
   "CronSourcesParsingCompletedEvent",
   "v1",

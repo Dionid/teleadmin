@@ -1,17 +1,16 @@
 import { initCronJobs } from "apps/main-gql/cron";
-import { EventBusPersistorService} from "apps/main-gql/event-bus-persistor";
+import { EventBusPersistorService } from "apps/main-gql/event-bus-persistor";
 import { initServer } from "apps/main-gql/server";
 import { initTgClient } from "apps/main-gql/set-tg-client";
 import { subscribeOnEvents } from "apps/main-gql/subs";
 import * as dotenv from "dotenv";
-import {getEnvOrThrow} from "fdd-ts";
+import { EventBusInMemoryService } from "fdd-ts/eda-in-memory";
+import * as Env from "fdd-ts/env";
+import { NotFoundError } from "fdd-ts/errors";
+import * as KnexUtils from "fdd-ts/knex-utils";
 import knex from "knex";
-import { EventBusInMemoryService} from "libs/@fdd/eda-inmemory";
-import { NotFoundError } from "libs/@fdd/errors";
-import { knexSnakeCaseMappers } from "libs/@fdd/knex/snakecase";
 import { initOrchestrator } from "modules/orchestrator";
 import winston from "winston";
-
 
 dotenv.config();
 
@@ -46,7 +45,7 @@ const main = async () => {
   });
 
   // ENV const
-  const getEnvOrThrowLogs = getEnvOrThrow(logger.error);
+  const getEnvOrThrowLogs = Env.getEnvOrThrow(logger.error);
 
   const connectionString = getEnvOrThrowLogs("MAIN_DB_CONNECTION_STRING");
   const jwtSecret = getEnvOrThrowLogs("JWT_SECRET");
@@ -64,16 +63,16 @@ const main = async () => {
       },
     },
     searchPath: ["knex", "public"],
-    ...knexSnakeCaseMappers(),
+    ...KnexUtils.knexSnakeCaseMappers(),
   });
 
   // . EDA
   const eventBusPersistorService = EventBusPersistorService.new({
-    knex: pg
+    knex: pg,
   });
 
   // . EDA
-  const eventBus = EventBusInMemoryService.new({
+  const eventBus = EventBusInMemoryService.create({
     persistor: eventBusPersistorService,
     tx: false,
     onError: (e) => {
@@ -88,7 +87,7 @@ const main = async () => {
     pg,
     logger,
     telegramClientRef,
-    eventBus,
+    eventBus
   );
 
   // . INTERNAL SUBSCRIBE

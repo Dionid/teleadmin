@@ -1,7 +1,7 @@
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { EventBusService} from "libs/@fdd/eda";
-import {FullEvent} from "libs/@fdd/eda/events";
-import { InternalError, NotFoundError } from "libs/@fdd/errors";
+import { Command, CommandFactory } from "fdd-ts/cqrs";
+import { EventBusService } from "fdd-ts/eda";
+import { FullEvent } from "fdd-ts/eda/events";
+import { InternalError, NotFoundError } from "fdd-ts/errors";
 import { checkIfMeIsChannelAdmin } from "libs/telegram-js/check-if-me-is-channel-admin";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import { getAllChannelParticipants } from "libs/telegram-js/get-channel-partisipants";

@@ -1,8 +1,7 @@
-import { BrandedPrimitive } from "libs/@fdd/branded";
+import * as Errors from "fdd-ts/errors";
+import { BrandedPrimitive } from "libs/@fdd/branded/index";
 import * as uuid from "uuid";
 import { v4 } from "uuid";
-
-import { ValidationError } from "../errors";
 
 export const StringX = {
   ofString: (
@@ -13,13 +12,13 @@ export const StringX = {
     value: string
   ) => {
     if (rules.min !== undefined && value.length < rules.min) {
-      return new ValidationError(
+      return new Errors.ValidationError(
         `${value} must be minimum ${rules.min} symbols`
       );
     }
 
     if (rules.max !== undefined && value.length > rules.max) {
-      return new ValidationError(
+      return new Errors.ValidationError(
         `${value} must be maximum ${rules.max} symbols`
       );
     }
@@ -42,7 +41,7 @@ export type UUID = BrandedPrimitive<string, { readonly UUID: unique symbol }>;
 export const UUID = {
   ofString: (value: string) => {
     return !uuid.validate(value)
-      ? new ValidationError("not valid uuid")
+      ? new Errors.ValidationError("not valid uuid")
       : (value as UUID);
   },
   new: () => {

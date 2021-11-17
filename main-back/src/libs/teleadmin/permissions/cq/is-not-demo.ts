@@ -1,6 +1,6 @@
+import { CommandOrQuery } from "fdd-ts/cqrs";
+import { CriticalError, PermissionDeniedError } from "fdd-ts/errors";
 import { Knex } from "knex";
-import { CommandOrQuery } from "libs/@fdd/cqrs";
-import { CriticalError, PermissionDeniedError } from "libs/@fdd/errors";
 import { UserTable } from "libs/main-db/models";
 
 export const IsNotDemo =

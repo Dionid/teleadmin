@@ -1,4 +1,4 @@
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
+import { Command, CommandFactory } from "fdd-ts/cqrs";
 import {
   User,
   UserDS,

@@ -1,5 +1,5 @@
+import { ValidationError } from "fdd-ts/errors";
 import { GraphQLScalarType, Kind } from "graphql";
-import { ValidationError } from "libs/@fdd/errors";
 import { validate } from "uuid";
 
 export const uuidScalar = new GraphQLScalarType({

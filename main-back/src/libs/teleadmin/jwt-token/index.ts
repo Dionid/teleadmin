@@ -1,5 +1,5 @@
+import { CriticalError } from "fdd-ts/errors";
 import jwt from "jsonwebtoken";
-import { CriticalError } from "libs/@fdd/errors";
 
 export type JWTToken = {
   sub: string;

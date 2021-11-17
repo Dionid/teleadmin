@@ -4,7 +4,7 @@ import {
   PermissionDeniedError,
   PublicError,
   returnOnThrow,
-} from "libs/@fdd/errors";
+} from "fdd-ts/errors";
 import { TgSourceTgId } from "modules/main/command/projections/tg-source";
 import { Api, TelegramClient } from "telegram";
 

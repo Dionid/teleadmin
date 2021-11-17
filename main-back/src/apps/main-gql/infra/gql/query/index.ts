@@ -1,9 +1,9 @@
 import { QueryResolvers } from "apps/main-gql/infra/gql/gqlgen-types";
 import { mapTgSource, mapTgUser } from "apps/main-gql/infra/gql/mappers";
 import { ResolversCtx } from "apps/main-gql/infra/gql/resolver-ctx";
+import { mapCommonSearchParamsToQuery } from "fdd-ts/apollo-knex";
+import { mapCountToNumber } from "fdd-ts/knex-utils";
 import { mapArray } from "functional-oriented-programming-ts";
-import { mapCommonSearchParamsToQuery } from "libs/@fdd/apollo-knex/query";
-import { mapCountToNumber } from "libs/@fdd/knex/fns";
 import { getQueryFields } from "libs/apollo/query-fields";
 import {
   TgSourceParticipantStatusTable,

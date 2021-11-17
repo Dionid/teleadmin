@@ -1,6 +1,6 @@
 import { BigInteger } from "big-integer";
+import { EventBusService } from "fdd-ts/eda";
 import { Matcher, mock, MockProxy } from "jest-mock-extended";
-import { EventBusService} from "libs/@fdd/eda";
 import { TgSourceInviteLinkHash } from "libs/telegram-js/types";
 import { UserAlreadyInChannelError } from "modules/main/command/handlers/add-private-source/errors";
 import { PrivateSourceAddedEvent } from "modules/main/command/handlers/add-private-source/events";

@@ -1,7 +1,7 @@
+import { CommandHandler } from "fdd-ts/cqrs";
+import { EventBusService } from "fdd-ts/eda";
 import { Maybe } from "functional-oriented-programming-ts";
 import { Knex } from "knex";
-import { CommandHandler } from "libs/@fdd/cqrs";
-import { EventBusService} from "libs/@fdd/eda";
 import { AuthenticateCmdHandler } from "modules/ia/command/handlers/authenticate";
 import { CreateFirstAdminCmdHandler } from "modules/ia/command/handlers/create-first-admin";
 import { CreateUserCmdHandler } from "modules/ia/command/handlers/create-user";

@@ -1,7 +1,7 @@
+import { PublicError, ValidationError } from "fdd-ts/errors";
 import { Knex } from "knex";
 import { BrandedPrimitive } from "libs/@fdd/branded";
-import { PublicError, ValidationError } from "libs/@fdd/errors";
-import { NotEmptyString, UUID } from "libs/@fdd/nominal/common";
+import { NotEmptyString, UUID } from "libs/@fdd/branded/common";
 import { TgSourceTable } from "libs/main-db/models";
 
 export type TgSourceId = BrandedPrimitive<

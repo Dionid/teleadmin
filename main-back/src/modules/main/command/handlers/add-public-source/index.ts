@@ -1,8 +1,8 @@
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { EventBusService} from "libs/@fdd/eda";
-import {FullEvent} from "libs/@fdd/eda/events";
-import { PublicError, returnOnThrow } from "libs/@fdd/errors";
-import { NotEmptyString } from "libs/@fdd/nominal/common";
+import { Command, CommandFactory } from "fdd-ts/cqrs";
+import { EventBusService } from "fdd-ts/eda";
+import { FullEvent } from "fdd-ts/eda/events";
+import { PublicError, returnOnThrow } from "fdd-ts/errors";
+import { NotEmptyString } from "libs/@fdd/branded/common";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import { PublicSourceAddedEvent } from "modules/main/command/handlers/add-public-source/events";
 import {
@@ -167,7 +167,11 @@ const sourceIsNew = async (
 };
 
 export const AddPublicSourceCmdHandler =
-  (client: TelegramClientRef, eventBus: EventBusService, tgSourceDS: TgSourceDS) =>
+  (
+    client: TelegramClientRef,
+    eventBus: EventBusService,
+    tgSourceDS: TgSourceDS
+  ) =>
   async (cmd: AddPublicSourceCmd) => {
     // . Check if source like that doesn't exist
     const source = await tgSourceDS.findByName(cmd.data.sourceName);

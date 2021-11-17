@@ -1,5 +1,5 @@
 import { BrandedPrimitive } from "libs/@fdd/branded";
-import { NotEmptyString } from "libs/@fdd/nominal/common";
+import { NotEmptyString } from "libs/@fdd/branded/common";
 
 export type TgSourceInviteLinkHash = BrandedPrimitive<
   NotEmptyString,

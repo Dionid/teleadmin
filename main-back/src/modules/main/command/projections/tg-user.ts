@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 import { BrandedPrimitive } from "libs/@fdd/branded";
-import { NotEmptyString, UUID } from "libs/@fdd/nominal/common";
+import { NotEmptyString, UUID } from "libs/@fdd/branded/common";
 import { TgUserTable } from "libs/main-db/models";
 import { Api } from "telegram";
 

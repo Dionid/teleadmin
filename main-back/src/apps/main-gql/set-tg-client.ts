@@ -1,7 +1,6 @@
+import { Event, EventBusService, EventFactory, FullEvent } from "fdd-ts/eda";
+import { NotFoundError } from "fdd-ts/errors";
 import { Knex } from "knex";
-import { EventBusService} from "libs/@fdd/eda";
-import {Event, EventFactory, FullEvent} from "libs/@fdd/eda/events";
-import { NotFoundError } from "libs/@fdd/errors";
 import { TgApplicationTable, TgHomunculusTable } from "libs/main-db/models";
 import { TelegramClient } from "telegram";
 import { StringSession } from "telegram/sessions";
@@ -18,7 +17,7 @@ export const TgClientConnectedEvent = EventFactory.new<TgClientConnectedEvent>(
 
 export const initTgClient = (
   knex: Knex,
-  eventBus: EventBusService,
+  eventBus: EventBusService
 ): [{ ref: TelegramClient }, () => void] => {
   const telegramClient: { ref: TelegramClient } = {
     ref: new TelegramClient(new StringSession(""), 111, "qwewe", {}),
@@ -61,14 +60,12 @@ export const initTgClient = (
 
     await telegramClient.ref.connect();
 
-    await eventBus.publish(
-      [
-        FullEvent.fromEvent({
-          event: TgClientConnectedEvent.new({}),
-          userId: null,
-        }),
-      ]
-    )
+    await eventBus.publish([
+      FullEvent.fromEvent({
+        event: TgClientConnectedEvent.new({}),
+        userId: null,
+      }),
+    ]);
   };
 
   return [telegramClient, setTgClient];

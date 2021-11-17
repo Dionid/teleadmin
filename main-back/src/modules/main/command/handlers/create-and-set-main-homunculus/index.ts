@@ -1,6 +1,6 @@
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { EventBusService} from "libs/@fdd/eda";
-import {Event, EventFactory, FullEvent} from "libs/@fdd/eda/events";
+import { Command, CommandFactory } from "fdd-ts/cqrs";
+import { EventBusService } from "fdd-ts/eda";
+import { Event, EventFactory, FullEvent } from "fdd-ts/eda/events";
 import {
   TgHomunculus,
   TgHomunculusDS,

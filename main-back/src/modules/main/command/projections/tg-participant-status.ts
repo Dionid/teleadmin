@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 import { BrandedPrimitive } from "libs/@fdd/branded";
-import { UUID } from "libs/@fdd/nominal/common";
+import { UUID } from "libs/@fdd/branded/common";
 import { TgSourceParticipantStatusTable } from "libs/main-db/models";
 import { TgSourceParticipantId } from "modules/main/command/projections/tg-source-participant";
 

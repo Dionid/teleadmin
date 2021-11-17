@@ -1,6 +1,6 @@
 import { BigInteger } from "big-integer";
+import { EventBusService } from "fdd-ts/eda";
 import { mock, MockProxy } from "jest-mock-extended";
-import { EventBusService} from "libs/@fdd/eda";
 import { checkIfMeIsChannelAdmin } from "libs/telegram-js/check-if-me-is-channel-admin";
 import { getAllChannelParticipants } from "libs/telegram-js/get-channel-partisipants";
 import {

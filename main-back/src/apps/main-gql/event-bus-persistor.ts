@@ -1,5 +1,5 @@
+import { FullEvent } from "fdd-ts/eda";
 import { Knex } from "knex";
-import {FullEvent} from "libs/@fdd/eda/events";
 import { EventModel } from "libs/main-db/models/event";
 
 export type EventBusPersistor = {
@@ -12,30 +12,33 @@ export const newEventBusPersistor = (knex: Knex): EventBusPersistor => {
   };
 };
 
-export const saveEvent =
-  async <E extends FullEvent>(persistor: EventBusPersistor, event: E): Promise<E> => {
-    await EventModel(persistor.knex).insert({
-      id: event.meta.id,
-      createdAt: new Date(),
-      type: event.type,
-      data: event.data,
-      version: event.version,
-      userId: event.meta.userId,
-      rootTransactionId: event.meta.rootTransactionId,
-    });
+export const saveEvent = async <E extends FullEvent>(
+  persistor: EventBusPersistor,
+  event: E
+): Promise<E> => {
+  await EventModel(persistor.knex).insert({
+    id: event.meta.id,
+    createdAt: new Date(),
+    type: event.type,
+    data: event.data,
+    version: event.version,
+    userId: event.meta.userId,
+    rootTransactionId: event.meta.rootTransactionId,
+  });
 
-    return event;
-  };
+  return event;
+};
 
 export const EventBusPersistor = {
   new: newEventBusPersistor,
   saveEvent,
-}
+};
 
 export const EventBusPersistorService = {
   new: (persistor: EventBusPersistor) => {
     return {
-      saveEvent: <E extends FullEvent>(event: E) => saveEvent<E>(persistor, event)
-    }
-  }
-}
+      saveEvent: <E extends FullEvent>(event: E) =>
+        saveEvent<E>(persistor, event),
+    };
+  },
+};

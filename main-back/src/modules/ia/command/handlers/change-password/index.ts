@@ -1,5 +1,5 @@
-import { Command } from "libs/@fdd/cqrs";
-import { CriticalError } from "libs/@fdd/errors";
+import { Command } from "fdd-ts/cqrs";
+import { CriticalError } from "fdd-ts/errors";
 import {
   User,
   UserDS,
