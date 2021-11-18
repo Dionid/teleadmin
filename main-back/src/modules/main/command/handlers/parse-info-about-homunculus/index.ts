@@ -1,5 +1,5 @@
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { CriticalError } from "libs/@fdd/errors";
+import { Command, CommandFactory } from "fdd-ts/cqrs";
+import { CriticalError } from "fdd-ts/errors";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import {
   TgUser,

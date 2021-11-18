@@ -1,15 +1,15 @@
 import * as crypto from "crypto";
 
+import { ValidationError } from "fdd-ts/errors";
+import { UUID } from "fdd-ts/fop-utils";
+import { BrandedPrimitive } from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { BrandedPrimitive } from "libs/@fdd/branded";
-import { ValidationError } from "libs/@fdd/errors";
-import { UUID } from "libs/@fdd/nominal/common";
 import { UserTable } from "libs/main-db/models";
 
 export type UserId = BrandedPrimitive<UUID, { readonly UserId: unique symbol }>;
 export const UserId = {
   newDefault: (): UserId => {
-    return UUID.new() as UserId;
+    return UUID.create() as UserId;
   },
   ofString: (value: string): UserId => {
     return UUID.ofString(value) as UserId;

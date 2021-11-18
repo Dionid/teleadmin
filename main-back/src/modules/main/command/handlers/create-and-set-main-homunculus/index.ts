@@ -1,5 +1,6 @@
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { Event, EventBus, EventFactory, FullEvent } from "libs/@fdd/eda";
+import { Command, CommandFactory } from "fdd-ts/cqrs";
+import { EventBusService } from "fdd-ts/eda";
+import { Event, EventBehaviour, FullEvent } from "fdd-ts/eda/events";
 import {
   TgHomunculus,
   TgHomunculusDS,
@@ -15,7 +16,7 @@ export type CreatedAndSettedMasterHomunculusEvent = Event<
   }
 >;
 export const CreatedAndSettedMasterHomunculusEvent =
-  EventFactory<CreatedAndSettedMasterHomunculusEvent>(
+  EventBehaviour.create<CreatedAndSettedMasterHomunculusEvent>(
     "CreatedAndSettedMasterHomunculusEvent",
     "v1"
   );
@@ -36,7 +37,7 @@ export type CreateAndSetMasterHomunculusCmdHandler = ReturnType<
 >;
 
 export const CreateAndSetMasterHomunculusCmdHandler =
-  (homunculusDS: TgHomunculusDS, eventBus: EventBus) =>
+  (homunculusDS: TgHomunculusDS, eventBus: EventBusService) =>
   async (cmd: CreateAndSetMasterHomunculusCmd) => {
     // . Check that there is no Homunculus with this phone
     if (await homunculusDS.isExistByPhone(cmd.data.phone)) {
@@ -60,7 +61,7 @@ export const CreateAndSetMasterHomunculusCmdHandler =
     await homunculusDS.create(homunculus);
 
     // . Send CreatedAndSettedMasterHomunculusEvent
-    const event = CreatedAndSettedMasterHomunculusEvent.new({
+    const event = CreatedAndSettedMasterHomunculusEvent.create({
       phone: homunculus.phone,
     });
 

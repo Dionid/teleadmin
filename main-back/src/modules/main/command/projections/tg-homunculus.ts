@@ -1,6 +1,9 @@
+import { UUID } from "fdd-ts/fop-utils";
+import {
+  BrandedPrimitive,
+  NotEmptyString,
+} from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { BrandedPrimitive } from "libs/@fdd/branded";
-import { NotEmptyString, UUID } from "libs/@fdd/nominal/common";
 import { TgHomunculusTable } from "libs/main-db/models";
 
 export type TgHomunculusId = BrandedPrimitive<
@@ -9,7 +12,7 @@ export type TgHomunculusId = BrandedPrimitive<
 >;
 export const TgHomunculusId = {
   new: () => {
-    return UUID.new() as TgHomunculusId;
+    return UUID.create() as TgHomunculusId;
   },
   ofString: (value: string) => {
     return UUID.ofString(value) as TgHomunculusId;

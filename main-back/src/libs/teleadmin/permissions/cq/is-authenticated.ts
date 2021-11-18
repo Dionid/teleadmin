@@ -1,5 +1,5 @@
-import { CommandOrQuery } from "libs/@fdd/cqrs";
-import { PermissionDeniedError } from "libs/@fdd/errors";
+import { CommandOrQuery } from "fdd-ts/cqrs";
+import { PermissionDeniedError } from "fdd-ts/errors";
 
 export const isAuthenticated = async <CQ extends CommandOrQuery<any, any>>(
   cq: CQ

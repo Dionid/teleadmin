@@ -1,6 +1,5 @@
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { EventBus } from "libs/@fdd/eda";
-import { NotFoundError } from "libs/@fdd/errors";
+import { Command, CommandFactory } from "fdd-ts/cqrs";
+import { NotFoundError } from "fdd-ts/errors";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import {
   TgSourceDS,
@@ -21,7 +20,7 @@ export const LeaveAndDeleteSourceCmd = CommandFactory<LeaveAndDeleteSourceCmd>(
 );
 
 export const LeaveAndDeleteSourceCmdHandler =
-  (client: TelegramClientRef, eventBus: EventBus, tgSourceDS: TgSourceDS) =>
+  (client: TelegramClientRef, tgSourceDS: TgSourceDS) =>
   async (cmd: LeaveAndDeleteSourceCmd) => {
     // . Get source
     const source = await tgSourceDS.findByIdAndNotDeleted(cmd.data.sourceId);

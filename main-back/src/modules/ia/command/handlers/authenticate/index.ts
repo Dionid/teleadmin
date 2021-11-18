@@ -1,4 +1,4 @@
-import { CommandFactory, Hybrid } from "libs/@fdd/cqrs";
+import { CommandFactory, Hybrid } from "fdd-ts/cqrs";
 import { JWTToken } from "libs/teleadmin/jwt-token";
 import {
   UserDS,

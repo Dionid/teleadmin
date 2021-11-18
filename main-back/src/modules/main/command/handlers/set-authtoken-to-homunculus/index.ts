@@ -1,8 +1,8 @@
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { EventBus } from "libs/@fdd/eda";
-import { NotFoundError } from "libs/@fdd/errors";
-import { NotEmptyString } from "libs/@fdd/nominal/common";
-import { AuthTokenToHomunculusSet } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
+import { Command, CommandFactory } from "fdd-ts/cqrs";
+import { EventBus } from "fdd-ts/eda";
+import { NotFoundError } from "fdd-ts/errors";
+import { NotEmptyString } from "functional-oriented-programming-ts/branded";
+import { AuthTokenToHomunculusSetEvent } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
 import {
   TgHomunculusDS,
   TgHomunculusPhone,
@@ -20,10 +20,10 @@ export const SetAuthTokenToHomunculusCmd =
   CommandFactory<SetAuthTokenToHomunculusCmd>("SetAuthTokenToHomunculusCmd");
 
 export const SetAuthTokenToHomunculusCmdHandler =
-  (homunculusDS: TgHomunculusDS, eventBus: EventBus) =>
+  (tgHomunculusDS: TgHomunculusDS, eventBus: EventBus) =>
   async (cmd: SetAuthTokenToHomunculusCmd) => {
     // . Find Homunculus by phone
-    const homunculus = await homunculusDS.getByPhone(cmd.data.phone);
+    const homunculus = await tgHomunculusDS.getByPhone(cmd.data.phone);
 
     if (!homunculus) {
       throw new NotFoundError(
@@ -35,18 +35,18 @@ export const SetAuthTokenToHomunculusCmdHandler =
     homunculus.authToken = cmd.data.authToken;
 
     // . Update Homunculus
-    await homunculusDS.update(homunculus);
+    await tgHomunculusDS.update(homunculus);
 
     // . Send Event
-    const event: AuthTokenToHomunculusSet = {
-      type: "AuthTokenToHomunculusSet",
+    const event: AuthTokenToHomunculusSetEvent = {
+      type: "AuthTokenToHomunculusSetEvent",
       version: "v1",
       data: {
         authToken: homunculus.authToken,
       },
     };
 
-    eventBus.publish([
+    EventBus.publish(eventBus, [
       {
         ...event,
         meta: {

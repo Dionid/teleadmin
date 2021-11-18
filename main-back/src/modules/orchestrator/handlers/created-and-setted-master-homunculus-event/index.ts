@@ -1,7 +1,7 @@
+import { Event, FullEvent, EventBus } from "fdd-ts/eda";
+import { CriticalError } from "fdd-ts/errors";
+import { NotEmptyString } from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { Event, EventBus, FullEvent } from "libs/@fdd/eda";
-import { CriticalError } from "libs/@fdd/errors";
-import { NotEmptyString } from "libs/@fdd/nominal/common";
 import { TgApplicationTable } from "libs/main-db/models";
 import { CreatedAndSettedMasterHomunculusEvent } from "modules/main/command/handlers/create-and-set-main-homunculus";
 import {
@@ -30,7 +30,8 @@ export const initCreatedAndSettedMasterHomunculusEventHandler = (
   eventBus: EventBus,
   knex: Knex
 ) => {
-  eventBus.subscribe<CreatedAndSettedMasterHomunculusEvent>(
+  EventBus.subscribe<CreatedAndSettedMasterHomunculusEvent>(
+    eventBus,
     CreatedAndSettedMasterHomunculusEvent.type,
     async (event) => {
       // . Get TgApp.apiId and tgApp.apiHash
@@ -59,9 +60,9 @@ export const initCreatedAndSettedMasterHomunculusEventHandler = (
         phoneCode: async () => {
           logger.debug("Waiting for code");
 
-          for await (const e of eventBus.observe<
+          for await (const e of EventBus.observe<
             FullEvent<HomunculusPhoneCodeReceived>
-          >("HomunculusPhoneCodeReceived")) {
+          >(eventBus, "HomunculusPhoneCodeReceived")) {
             logger.debug("HomunculusPhoneCodeReceived EVENT RECEIVED", e.data);
 
             if (e.data.data.phone === event.data.phone) {
@@ -89,7 +90,7 @@ export const initCreatedAndSettedMasterHomunculusEventHandler = (
           }),
           eventBus
         )(
-          SetAuthTokenToHomunculusCmd.new(
+          SetAuthTokenToHomunculusCmd.create(
             {
               phone: event.data.phone,
               authToken,

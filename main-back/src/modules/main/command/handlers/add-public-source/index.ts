@@ -1,7 +1,8 @@
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { EventBus, FullEvent } from "libs/@fdd/eda";
-import { PublicError, returnOnThrow } from "libs/@fdd/errors";
-import { NotEmptyString } from "libs/@fdd/nominal/common";
+import { Command, CommandFactory } from "fdd-ts/cqrs";
+import { EventBusService } from "fdd-ts/eda";
+import { FullEvent } from "fdd-ts/eda/events";
+import { PublicError, returnOnThrow } from "fdd-ts/errors";
+import { NotEmptyString } from "functional-oriented-programming-ts/branded";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import { PublicSourceAddedEvent } from "modules/main/command/handlers/add-public-source/events";
 import {
@@ -45,7 +46,7 @@ const getChannelTitle = (channelResultOrErr: ChatFull): string => {
 const sourceWasDeleted = async (
   client: TelegramClientRef,
   tgSourceDS: TgSourceDS,
-  eventBus: EventBus,
+  eventBus: EventBusService,
   cmd: AddPublicSourceCmd,
   source: TgSource
 ) => {
@@ -88,7 +89,7 @@ const sourceWasDeleted = async (
   await tgSourceDS.update(updatedDeletedSource);
 
   // . Success
-  const event = PublicSourceAddedEvent.new({
+  const event = PublicSourceAddedEvent.create({
     id: updatedDeletedSource.id,
     tgId: updatedDeletedSource.tgId,
     tgName: updatedDeletedSource.tgName,
@@ -105,7 +106,7 @@ const sourceWasDeleted = async (
 const sourceIsNew = async (
   client: TelegramClientRef,
   tgSourceDS: TgSourceDS,
-  eventBus: EventBus,
+  eventBus: EventBusService,
   cmd: AddPublicSourceCmd
 ) => {
   // . Join channel
@@ -151,7 +152,7 @@ const sourceIsNew = async (
   await tgSourceDS.create(newSource);
 
   // . Success
-  const event = PublicSourceAddedEvent.new({
+  const event = PublicSourceAddedEvent.create({
     id: newSource.id,
     tgId: newSource.tgId,
     tgName: newSource.tgName,
@@ -166,7 +167,11 @@ const sourceIsNew = async (
 };
 
 export const AddPublicSourceCmdHandler =
-  (client: TelegramClientRef, eventBus: EventBus, tgSourceDS: TgSourceDS) =>
+  (
+    client: TelegramClientRef,
+    eventBus: EventBusService,
+    tgSourceDS: TgSourceDS
+  ) =>
   async (cmd: AddPublicSourceCmd) => {
     // . Check if source like that doesn't exist
     const source = await tgSourceDS.findByName(cmd.data.sourceName);

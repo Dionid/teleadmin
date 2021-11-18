@@ -1,7 +1,10 @@
+import { UUID } from "fdd-ts/fop-utils";
+import { countMoreThanZero } from "fdd-ts/knex-utils";
+import {
+  BrandedPrimitive,
+  NotEmptyString,
+} from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { BrandedPrimitive } from "libs/@fdd/branded";
-import { countMoreThanZero } from "libs/@fdd/knex/fns";
-import { NotEmptyString, UUID } from "libs/@fdd/nominal/common";
 import { TgApplicationTable } from "libs/main-db/models";
 
 export type TgApplicationId = BrandedPrimitive<
@@ -10,7 +13,7 @@ export type TgApplicationId = BrandedPrimitive<
 >;
 export const TgApplicationId = {
   new: () => {
-    return UUID.new() as TgApplicationId;
+    return UUID.create() as TgApplicationId;
   },
   ofString: (value: string) => {
     return UUID.ofString(value) as TgApplicationId;

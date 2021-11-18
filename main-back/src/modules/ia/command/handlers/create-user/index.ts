@@ -1,5 +1,5 @@
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { PublicError } from "libs/@fdd/errors";
+import { Command, CommandFactory } from "fdd-ts/cqrs";
+import { PublicError } from "fdd-ts/errors";
 import {
   User,
   UserDS,

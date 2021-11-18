@@ -1,7 +1,10 @@
+import { PublicError, ValidationError } from "fdd-ts/errors";
+import { UUID } from "fdd-ts/fop-utils";
+import {
+  BrandedPrimitive,
+  NotEmptyString,
+} from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { BrandedPrimitive } from "libs/@fdd/branded";
-import { PublicError, ValidationError } from "libs/@fdd/errors";
-import { NotEmptyString, UUID } from "libs/@fdd/nominal/common";
 import { TgSourceTable } from "libs/main-db/models";
 
 export type TgSourceId = BrandedPrimitive<
@@ -10,7 +13,7 @@ export type TgSourceId = BrandedPrimitive<
 >;
 export const TgSourceId = {
   new: () => {
-    return UUID.new() as TgSourceId;
+    return UUID.create() as TgSourceId;
   },
   ofString: (value: string) => {
     return UUID.ofString(value) as TgSourceId;

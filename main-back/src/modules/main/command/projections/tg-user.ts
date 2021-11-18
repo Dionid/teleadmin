@@ -1,6 +1,9 @@
+import { UUID } from "fdd-ts/fop-utils";
+import {
+  BrandedPrimitive,
+  NotEmptyString,
+} from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { BrandedPrimitive } from "libs/@fdd/branded";
-import { NotEmptyString, UUID } from "libs/@fdd/nominal/common";
 import { TgUserTable } from "libs/main-db/models";
 import { Api } from "telegram";
 
@@ -12,7 +15,7 @@ export type TgUserId = BrandedPrimitive<
 >;
 export const TgUserId = {
   new: () => {
-    return UUID.new() as TgUserId;
+    return UUID.create() as TgUserId;
   },
   ofString: (value: string) => {
     return UUID.ofString(value) as TgUserId;

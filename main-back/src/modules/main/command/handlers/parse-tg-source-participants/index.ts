@@ -1,6 +1,7 @@
-import { Command, CommandFactory } from "libs/@fdd/cqrs";
-import { EventBus, FullEvent } from "libs/@fdd/eda";
-import { InternalError, NotFoundError } from "libs/@fdd/errors";
+import { Command, CommandFactory } from "fdd-ts/cqrs";
+import { EventBusService } from "fdd-ts/eda";
+import { FullEvent } from "fdd-ts/eda/events";
+import { InternalError, NotFoundError } from "fdd-ts/errors";
 import { checkIfMeIsChannelAdmin } from "libs/telegram-js/check-if-me-is-channel-admin";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import { getAllChannelParticipants } from "libs/telegram-js/get-channel-partisipants";
@@ -57,7 +58,7 @@ export const ParseTgSourceParticipantsCmdHandler =
   (
     logger: Logger,
     client: TelegramClientRef,
-    eventBus: EventBus,
+    eventBus: EventBusService,
     tgUserDS: TgUserDS,
     tgSourceParticipantDS: TgSourceParticipantDS,
     tgSourceDS: TgSourceDS,
@@ -126,7 +127,7 @@ export const ParseTgSourceParticipantsCmdHandler =
 
     eventBus.publish([
       FullEvent.fromCmdOrQuery({
-        event: TgSourceParticipantsParsedEvent.new({}),
+        event: TgSourceParticipantsParsedEvent.create({}),
         meta: cmd.meta,
       }),
     ]);

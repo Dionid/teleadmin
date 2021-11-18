@@ -1,7 +1,7 @@
 import { CronSourcesParsingCompletedEvent } from "apps/main-gql/subs";
 import { CronJob } from "cron";
+import { EventBusService, FullEvent } from "fdd-ts/eda";
 import { Knex } from "knex";
-import { EventBus, FullEvent } from "libs/@fdd/eda";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import {
   ParseTgSourceParticipantsCmd,
@@ -18,7 +18,7 @@ export const initCronJobs = (
   knex: Knex,
   logger: Logger,
   telegramClientRef: TelegramClientRef,
-  eventBus: EventBus
+  eventBus: EventBusService
 ) => {
   const parseSourcesJob = new CronJob("5 0 * * *", async () => {
     const sources = await TgSourceDS(knex).findAllNotDeleted();
@@ -26,7 +26,7 @@ export const initCronJobs = (
       sources.map(async (source) => {
         logger.debug("SOURCE PARSING FIRED");
         const cmd: ParseTgSourceParticipantsCmd =
-          ParseTgSourceParticipantsCmd.new(
+          ParseTgSourceParticipantsCmd.create(
             {
               sourceId: source.id,
             },
@@ -53,9 +53,9 @@ export const initCronJobs = (
         });
       })
     );
-    eventBus.publish([
+    await eventBus.publish([
       FullEvent.fromEvent({
-        event: CronSourcesParsingCompletedEvent.new({}),
+        event: CronSourcesParsingCompletedEvent.create({}),
         userId: null, // TODO. Change to server userid
       }),
     ]);

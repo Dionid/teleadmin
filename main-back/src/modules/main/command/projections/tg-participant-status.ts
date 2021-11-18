@@ -1,6 +1,6 @@
+import { UUID } from "fdd-ts/fop-utils";
+import { BrandedPrimitive } from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
-import { BrandedPrimitive } from "libs/@fdd/branded";
-import { UUID } from "libs/@fdd/nominal/common";
 import { TgSourceParticipantStatusTable } from "libs/main-db/models";
 import { TgSourceParticipantId } from "modules/main/command/projections/tg-source-participant";
 
@@ -10,7 +10,7 @@ export type TgSourceParticipantStatusId = BrandedPrimitive<
 >;
 export const TgSourceParticipantStatusId = {
   new: () => {
-    return UUID.new() as TgSourceParticipantStatusId;
+    return UUID.create() as TgSourceParticipantStatusId;
   },
   ofString: (value: string) => {
     return UUID.ofString(value) as TgSourceParticipantStatusId;

@@ -1,23 +1,24 @@
 import { TgClientConnectedEvent } from "apps/main-gql/set-tg-client";
 import { CronJob } from "cron";
+import { Event, EventBus, EventBehaviour } from "fdd-ts/eda";
+import { NotFoundError } from "fdd-ts/errors";
 import { Knex } from "knex";
-import { Event, EventBus, EventFactory } from "libs/@fdd/eda";
-import { NotFoundError } from "libs/@fdd/errors";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import {
   ParseInfoAboutHomunculusCmd,
   ParseInfoAboutHomunculusCmdHandler,
 } from "modules/main/command/handlers/parse-info-about-homunculus";
-import { AuthTokenToHomunculusSet } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
+import { AuthTokenToHomunculusSetEvent } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
 import { TgUserDS } from "modules/main/command/projections/tg-user";
 import { Logger } from "winston";
+
 export type CronSourcesParsingCompletedEvent = Event<
   "CronSourcesParsingCompletedEvent",
   "v1",
   Record<any, any>
 >;
 export const CronSourcesParsingCompletedEvent =
-  EventFactory<CronSourcesParsingCompletedEvent>(
+  EventBehaviour.create<CronSourcesParsingCompletedEvent>(
     "CronSourcesParsingCompletedEvent",
     "v1"
   );
@@ -30,20 +31,22 @@ export const subscribeOnEvents = (
   clientRef: TelegramClientRef,
   job: CronJob
 ) => {
-  eventBus.subscribe<TgClientConnectedEvent>(
+  EventBus.subscribe<TgClientConnectedEvent>(
+    eventBus,
     TgClientConnectedEvent.type,
     async (event) => {
       await knex.transaction(async (tx) => {
         await ParseInfoAboutHomunculusCmdHandler(
           clientRef,
           TgUserDS(tx)
-        )(ParseInfoAboutHomunculusCmd.new({}, { userId: null }));
+        )(ParseInfoAboutHomunculusCmd.create({}, { userId: null }));
       });
       job.start();
     }
   );
-  eventBus.subscribe<AuthTokenToHomunculusSet>(
-    "AuthTokenToHomunculusSet",
+  EventBus.subscribe<AuthTokenToHomunculusSetEvent>(
+    eventBus,
+    "AuthTokenToHomunculusSetEvent",
     async (event) => {
       try {
         await setTgClient();

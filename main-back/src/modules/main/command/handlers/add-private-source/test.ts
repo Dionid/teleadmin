@@ -1,6 +1,6 @@
 import { BigInteger } from "big-integer";
+import { EventBusService } from "fdd-ts/eda";
 import { Matcher, mock, MockProxy } from "jest-mock-extended";
-import { EventBus } from "libs/@fdd/eda";
 import { TgSourceInviteLinkHash } from "libs/telegram-js/types";
 import { UserAlreadyInChannelError } from "modules/main/command/handlers/add-private-source/errors";
 import { PrivateSourceAddedEvent } from "modules/main/command/handlers/add-private-source/events";
@@ -29,7 +29,7 @@ describe("AddPrivateSourceCmdHandler", () => {
   let client: {
     ref: MockProxy<TelegramClient>;
   };
-  let eventBus: MockProxy<EventBus>;
+  let eventBus: MockProxy<EventBusService>;
   let cmd: AddPrivateSourceCmd;
   let sourceInviteLinkHash: TgSourceInviteLinkHash;
   let sourceType: TgSourceType;
@@ -39,11 +39,11 @@ describe("AddPrivateSourceCmdHandler", () => {
     client = {
       ref: mock<TelegramClient>(),
     };
-    eventBus = mock<EventBus>();
+    eventBus = mock<EventBusService>();
     sourceInviteLinkHash = TgSourceInviteLinkHash.ofString("");
     sourceType = TgSourceType.fromString("Channel");
 
-    cmd = AddPrivateSourceCmd.new(
+    cmd = AddPrivateSourceCmd.create(
       {
         sourceInviteLinkHash,
         sourceType,
@@ -164,7 +164,7 @@ describe("AddPrivateSourceCmdHandler", () => {
       return projection;
     });
 
-    eventBus.publish.mockImplementation((events) => {
+    eventBus.publish.mockImplementation(async (events) => {
       const event = events[0];
 
       if (!PrivateSourceAddedEvent.isFull(event)) {
