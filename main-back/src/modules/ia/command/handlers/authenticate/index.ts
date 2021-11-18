@@ -1,5 +1,6 @@
 import { CommandFactory, Hybrid } from "fdd-ts/cqrs";
 import { JWTToken } from "libs/teleadmin/jwt-token";
+import { CommonDS } from "modules/ia/command/projections";
 import {
   UserDS,
   UserEmail,
@@ -27,9 +28,9 @@ export const AuthenticateCmd = CommandFactory("AuthenticateCmd");
 export type AuthenticateCmdHandler = ReturnType<typeof AuthenticateCmdHandler>;
 
 export const AuthenticateCmdHandler =
-  (salt: string, userDS: UserDS) => async (cmd: AuthenticateCmd) => {
+  (salt: string, commonDS: CommonDS) => async (cmd: AuthenticateCmd) => {
     // . Get user
-    const user = await userDS.findByEmail(cmd.data.email);
+    const user = await UserDS.findByEmail(commonDS, cmd.data.email);
 
     if (!user) {
       throw new EmailOrPasswordIsIncorrect();

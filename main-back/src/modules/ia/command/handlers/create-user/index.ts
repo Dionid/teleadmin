@@ -1,8 +1,9 @@
 import { Command, CommandFactory } from "fdd-ts/cqrs";
 import { PublicError } from "fdd-ts/errors";
+import { CommonDS } from "modules/ia/command/projections";
 import {
-  User,
   UserDS,
+  User,
   UserEmail,
   UserHashedPassword,
 } from "modules/ia/command/projections/user";
@@ -19,11 +20,11 @@ export const CreateUserCmd = CommandFactory("CreateUserCmd");
 export type CreateUserCmdHandler = ReturnType<typeof CreateUserCmdHandler>;
 
 export const CreateUserCmdHandler =
-  (userDS: UserDS) => async (cmd: CreateUserCmd) => {
+  (commonDS: CommonDS) => async (cmd: CreateUserCmd) => {
     const newUser = User.newUnactivatedUser(cmd.data.email, cmd.data.password);
 
     try {
-      await userDS.create(newUser);
+      await UserDS.create(commonDS, newUser);
     } catch (e) {
       if (e instanceof Error && e.message.includes("user_email_key")) {
         throw new PublicError("User with this email already exists");

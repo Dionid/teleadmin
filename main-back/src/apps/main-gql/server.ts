@@ -11,11 +11,12 @@ import { UserTable } from "libs/main-db/models";
 import { JWTToken } from "libs/teleadmin/jwt-token";
 import { isAuthenticated } from "libs/teleadmin/permissions/cq/is-authenticated";
 import { IsNotDemo } from "libs/teleadmin/permissions/cq/is-not-demo";
+import { BaseDS } from "libs/teleadmin/projections/ds";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import { AuthenticateCmdHandler } from "modules/ia/command/handlers/authenticate";
 import { CreateFirstAdminCmdHandler } from "modules/ia/command/handlers/create-first-admin";
 import { CreateUserCmdHandler } from "modules/ia/command/handlers/create-user";
-import { UserDS, UserId } from "modules/ia/command/projections/user";
+import { UserId } from "modules/ia/command/projections/user";
 import { AddPrivateSourceCmdHandler } from "modules/main/command/handlers/add-private-source";
 import { AddPublicSourceCmdHandler } from "modules/main/command/handlers/add-public-source";
 import { CreateAndSetMainApplicationCmdHandler } from "modules/main/command/handlers/create-and-set-main-application";
@@ -85,7 +86,11 @@ export const initServer = (
         tgSourceParticipantDS,
         tgSourceParticipantStatusDS
       );
-      const userDS = UserDS(tx);
+
+      const baseDS: BaseDS = {
+        knex: tx,
+        logger,
+      };
 
       // . ASPECTS
       const isAuthenticatedAndNotDemoAspect = pipeAsync(
@@ -94,12 +99,12 @@ export const initServer = (
       );
 
       // . COMMAND HANDLERS
-      const createFirstAdmin = CreateFirstAdminCmdHandler(userDS);
+      const createFirstAdmin = CreateFirstAdminCmdHandler(baseDS);
       const createUser = pipeAsync(
         isAuthenticatedAndNotDemoAspect,
-        CreateUserCmdHandler(userDS)
+        CreateUserCmdHandler(baseDS)
       );
-      const authenticate = AuthenticateCmdHandler(jwtSecret, userDS);
+      const authenticate = AuthenticateCmdHandler(jwtSecret, baseDS);
       const createAndSetMainApplicationCmdHandler = pipeAsync(
         isAuthenticatedAndNotDemoAspect,
         CreateAndSetMainApplicationCmdHandler(tgApplicationDS)
