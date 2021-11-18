@@ -5,13 +5,14 @@ import { PublicError, returnOnThrow } from "fdd-ts/errors";
 import { NotEmptyString } from "functional-oriented-programming-ts/branded";
 import { TelegramClientRef } from "libs/telegram-js/client";
 import { PublicSourceAddedEvent } from "modules/main/command/handlers/add-public-source/events";
+import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgSource,
-  TgSourceDS,
   TgSourceId,
   TgSourceTgId,
   TgSourceType,
 } from "modules/main/command/projections/tg-source";
+import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import { Api } from "telegram";
 
 import Channel = Api.Channel;
@@ -45,8 +46,8 @@ const getChannelTitle = (channelResultOrErr: ChatFull): string => {
 
 const sourceWasDeleted = async (
   client: TelegramClientRef,
-  tgSourceDS: TgSourceDS,
   eventBus: EventBusService,
+  ds: MainModuleDS,
   cmd: AddPublicSourceCmd,
   source: TgSource
 ) => {
@@ -86,7 +87,7 @@ const sourceWasDeleted = async (
     tgTitle: getChannelTitle(channelResultOrErr),
     deletedAt: null,
   };
-  await tgSourceDS.update(updatedDeletedSource);
+  await TgSourceDS.update(ds, updatedDeletedSource);
 
   // . Success
   const event = PublicSourceAddedEvent.create({
@@ -105,7 +106,7 @@ const sourceWasDeleted = async (
 
 const sourceIsNew = async (
   client: TelegramClientRef,
-  tgSourceDS: TgSourceDS,
+  ds: MainModuleDS,
   eventBus: EventBusService,
   cmd: AddPublicSourceCmd
 ) => {
@@ -149,7 +150,7 @@ const sourceIsNew = async (
     tgTitle: getChannelTitle(channelResultOrErr),
     deletedAt: null,
   };
-  await tgSourceDS.create(newSource);
+  await TgSourceDS.create(ds, newSource);
 
   // . Success
   const event = PublicSourceAddedEvent.create({
@@ -167,19 +168,15 @@ const sourceIsNew = async (
 };
 
 export const AddPublicSourceCmdHandler =
-  (
-    client: TelegramClientRef,
-    eventBus: EventBusService,
-    tgSourceDS: TgSourceDS
-  ) =>
+  (client: TelegramClientRef, eventBus: EventBusService, ds: MainModuleDS) =>
   async (cmd: AddPublicSourceCmd) => {
     // . Check if source like that doesn't exist
-    const source = await tgSourceDS.findByName(cmd.data.sourceName);
+    const source = await TgSourceDS.findByName(ds, cmd.data.sourceName);
 
     if (!source) {
-      await sourceIsNew(client, tgSourceDS, eventBus, cmd);
+      await sourceIsNew(client, ds, eventBus, cmd);
     } else if (TgSource.wasDeleted(source)) {
-      await sourceWasDeleted(client, tgSourceDS, eventBus, cmd, source);
+      await sourceWasDeleted(client, eventBus, ds, cmd, source);
     } else {
       throw new PublicError(
         `you already have source with tg name ${cmd.data.sourceName}`

@@ -1,3 +1,4 @@
+import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgSourceParticipantStatus,
   TgSourceParticipantStatusDS,
@@ -7,22 +8,22 @@ import { TgSourceParticipantDS } from "modules/main/command/projections/tg-sourc
 import { TgUser } from "modules/main/command/projections/tg-user";
 
 export const markLeftParticipants = async (
-  tgSourceParticipantDS: TgSourceParticipantDS,
-  tgSourceParticipantStatusDS: TgSourceParticipantStatusDS,
+  ds: MainModuleDS,
   tgUsers: TgUser[],
   source: TgSource
 ) => {
   // . Get all participants not in this list & status "Joined" | "Rejoined" -> "Left"
   const deltaTgParticipants =
-    await tgSourceParticipantDS.getTgSourceIdAndTgUserIdNotInWithStatusJoinedRejoined(
+    await TgSourceParticipantDS.getTgSourceIdAndTgUserIdNotInWithStatusJoinedRejoined(
+      ds,
       source.id,
       tgUsers.map((user) => user.id)
     );
   await Promise.all(
     deltaTgParticipants.map(async (participant) => {
       const tgSourceParticipantStatus: TgSourceParticipantStatus =
-        TgSourceParticipantStatus.newLeft(participant.id);
-      await tgSourceParticipantStatusDS.create(tgSourceParticipantStatus);
+        TgSourceParticipantStatus.createLeft(participant.id);
+      await TgSourceParticipantStatusDS.create(ds, tgSourceParticipantStatus);
     })
   );
 };

@@ -1,6 +1,7 @@
 import { Command, CommandFactory } from "fdd-ts/cqrs";
 import { CriticalError } from "fdd-ts/errors";
 import { TelegramClientRef } from "libs/telegram-js/client";
+import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgUser,
   TgUserDS,
@@ -16,7 +17,7 @@ export const ParseInfoAboutHomunculusCmd =
   CommandFactory<ParseInfoAboutHomunculusCmd>("ParseInfoAboutHomunculusCmd");
 
 export const ParseInfoAboutHomunculusCmdHandler =
-  (clientRef: TelegramClientRef, tgUserDS: TgUserDS) =>
+  (clientRef: TelegramClientRef, ds: MainModuleDS) =>
   async (cmd: ParseInfoAboutHomunculusCmd) => {
     // . Get homunculus info
     const me = await clientRef.ref.getMe();
@@ -25,17 +26,20 @@ export const ParseInfoAboutHomunculusCmdHandler =
       throw new CriticalError("Information about homunculus is not User type");
     }
 
-    const homunculus = await tgUserDS.findByTgId(TgUserTgId.ofString(me.id));
+    const homunculus = await TgUserDS.findByTgId(
+      ds,
+      TgUserTgId.ofString(me.id)
+    );
 
     // . Create homunculus if not exists
     if (!homunculus) {
-      const newHomunculus: TgUser = TgUser.newFromTgApiUser(me);
-      await tgUserDS.create(newHomunculus);
+      const newHomunculus: TgUser = TgUser.createFromTgApiUser(me);
+      await TgUserDS.create(ds, newHomunculus);
 
       return;
     }
 
     // . Update homunculus if exist
     const updatedHomunculus: TgUser = TgUser.mergeWithTgApiUser(homunculus, me);
-    await tgUserDS.update(updatedHomunculus);
+    await TgUserDS.update(ds, updatedHomunculus);
   };

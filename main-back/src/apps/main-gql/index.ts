@@ -98,7 +98,11 @@ const main = async () => {
     pg,
     logger,
     telegramClientRef,
-    eventBusService
+    eventBusService,
+    {
+      knex: pg,
+      logger,
+    }
   );
 
   // . INTERNAL SUBSCRIBE

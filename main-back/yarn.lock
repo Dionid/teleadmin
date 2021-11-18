@@ -3453,10 +3453,10 @@ fbjs@^3.0.0:
     setimmediate "^1.0.5"
     ua-parser-js "^0.7.30"
 
-fdd-ts@0.0.7:
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/fdd-ts/-/fdd-ts-0.0.7.tgz#ce0b02f0b1be24a7ab3f06185a281cc672ea8260"
-  integrity sha512-7peNnPc/H1jp54yudAQlwIgaOVhiAZTnG0+UaFVkMxKgN00ORxtQDm1BFJfVCLaozvC71zbW65zSSINP3BFDkQ==
+fdd-ts@0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/fdd-ts/-/fdd-ts-0.0.8.tgz#5bf6e81e92b85e9b2ad6f68e02333bcdef1bec69"
+  integrity sha512-g0lSnyHvJ6BaIlwN12emlpdY2bb2CCTH5DCy0APgDIH6iccuhc9MHN753sthCs4TXNSdgNjtgvkeaLE0dqus/g==
   dependencies:
     functional-oriented-programming-ts "^0.0.12"
     knex "^0.95.14"

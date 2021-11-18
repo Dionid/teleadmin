@@ -1,15 +1,15 @@
 import { createTgParticipant } from "modules/main/command/handlers/parse-tg-source-participants/operations/create-tg-participant";
+import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgSourceParticipantStatus,
   TgSourceParticipantStatusDS,
 } from "modules/main/command/projections/tg-participant-status";
 import { TgSource } from "modules/main/command/projections/tg-source";
-import { TgSourceParticipantDS } from "modules/main/command/projections/tg-source-participant";
 import { TgSourceParticipantWithStatus } from "modules/main/command/projections/tg-source-participant-with-status";
 import { TgUser } from "modules/main/command/projections/tg-user";
 
 export const tgUserIsParticipant = async (
-  tgSourceParticipantStatusDS: TgSourceParticipantStatusDS,
+  ds: MainModuleDS,
   tgSourceParticipantWithStatus: TgSourceParticipantWithStatus
 ) => {
   switch (tgSourceParticipantWithStatus.status) {
@@ -18,15 +18,17 @@ export const tgUserIsParticipant = async (
     case "Rejoined":
       break;
     case "Left":
-      await tgSourceParticipantStatusDS.create(
-        TgSourceParticipantStatus.newRejoined(
+      await TgSourceParticipantStatusDS.create(
+        ds,
+        TgSourceParticipantStatus.createRejoined(
           tgSourceParticipantWithStatus.participant.id
         )
       );
       break;
     case "None":
-      await tgSourceParticipantStatusDS.create(
-        TgSourceParticipantStatus.newJoined(
+      await TgSourceParticipantStatusDS.create(
+        ds,
+        TgSourceParticipantStatus.createJoined(
           tgSourceParticipantWithStatus.participant.id
         )
       );
@@ -35,16 +37,10 @@ export const tgUserIsParticipant = async (
 };
 
 export const tgUserIsNotParticipant = async (
-  tgSourceParticipantDS: TgSourceParticipantDS,
-  tgSourceParticipantStatusDS: TgSourceParticipantStatusDS,
+  ds: MainModuleDS,
 
   tgUser: TgUser,
   source: TgSource
 ) => {
-  await createTgParticipant(
-    source.id,
-    tgUser.id,
-    tgSourceParticipantDS,
-    tgSourceParticipantStatusDS
-  );
+  await createTgParticipant(ds, source.id, tgUser.id);
 };

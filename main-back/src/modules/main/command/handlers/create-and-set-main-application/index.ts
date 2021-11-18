@@ -1,10 +1,11 @@
 import { Command, CommandFactory } from "fdd-ts/cqrs";
 import { NotEmptyString } from "functional-oriented-programming-ts/branded";
+import { MainModuleDS } from "modules/main/command/projections";
+import { TgApplicationDS } from "modules/main/command/projections/tg-application/ds";
 import {
   TgApplication,
-  TgApplicationDS,
   TgApplicationId,
-} from "modules/main/command/projections/tg-application";
+} from "modules/main/command/projections/tg-application/projection";
 
 export type CreateAndSetMainApplicationCmd = Command<
   "CreateAndSetMainApplicationCmd",
@@ -24,14 +25,15 @@ export type CreateAndSetMainApplicationCmdHandler = ReturnType<
 >;
 
 export const CreateAndSetMainApplicationCmdHandler =
-  (tgAppDS: TgApplicationDS) => async (cmd: CreateAndSetMainApplicationCmd) => {
+  (mainModuleDS: MainModuleDS) =>
+  async (cmd: CreateAndSetMainApplicationCmd) => {
     // . Check that there is no app with this appId
-    if (await tgAppDS.isExistByAppId(cmd.data.appId)) {
+    if (await TgApplicationDS.isExistByAppId(mainModuleDS, cmd.data.appId)) {
       throw new Error(`There is already app with app id ${cmd.data.appId}`);
     }
 
     // . Check that there is no main app
-    if (await tgAppDS.isMainAppExist()) {
+    if (await TgApplicationDS.isMainAppExist(mainModuleDS)) {
       throw new Error("Main app already exist");
     }
 
@@ -40,7 +42,7 @@ export const CreateAndSetMainApplicationCmdHandler =
 
     // . Create new Application
     const app: TgApplication = {
-      id: TgApplicationId.new(),
+      id: TgApplicationId.create(),
       name: cmd.data.name,
       appId: cmd.data.appId,
       appHash: cmd.data.appHash,
@@ -48,7 +50,7 @@ export const CreateAndSetMainApplicationCmdHandler =
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    await tgAppDS.create(app);
+    await TgApplicationDS.create(mainModuleDS, app);
 
     // . Send TgApplicationCreatedAndSettedAsMainEvent
     // ...

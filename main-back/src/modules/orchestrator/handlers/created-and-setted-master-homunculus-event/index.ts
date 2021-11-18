@@ -8,10 +8,7 @@ import {
   SetAuthTokenToHomunculusCmd,
   SetAuthTokenToHomunculusCmdHandler,
 } from "modules/main/command/handlers/set-authtoken-to-homunculus";
-import {
-  TgHomunculusDS,
-  TgHomunculusPhone,
-} from "modules/main/command/projections/tg-homunculus";
+import { TgHomunculusPhone } from "modules/main/command/projections/tg-homunculus";
 import { TelegramClient } from "telegram";
 import { StringSession } from "telegram/sessions";
 import { Logger } from "winston";
@@ -85,9 +82,10 @@ export const initCreatedAndSettedMasterHomunculusEventHandler = (
 
       await knex.transaction(async (tx) => {
         await SetAuthTokenToHomunculusCmdHandler(
-          TgHomunculusDS({
+          {
             knex: tx,
-          }),
+            logger,
+          },
           eventBus
         )(
           SetAuthTokenToHomunculusCmd.create(
