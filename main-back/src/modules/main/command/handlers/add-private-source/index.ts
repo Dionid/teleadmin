@@ -12,11 +12,11 @@ import { UserAlreadyInChannelError } from "modules/main/command/handlers/add-pri
 import { PrivateSourceAddedEvent } from "modules/main/command/handlers/add-private-source/events";
 import {
   TgSource,
-  TgSourceDS,
   TgSourceId,
   TgSourceTgId,
   TgSourceType,
 } from "modules/main/command/projections/tg-source";
+import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import { Api } from "telegram";
 
 import Channel = Api.Channel;

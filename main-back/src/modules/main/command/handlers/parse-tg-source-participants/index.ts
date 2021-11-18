@@ -12,12 +12,10 @@ import {
   tgUserExist,
 } from "modules/main/command/handlers/parse-tg-source-participants/operations/user-presence";
 import { TgSourceParticipantStatusDS } from "modules/main/command/projections/tg-participant-status";
-import {
-  TgSourceDS,
-  TgSourceId,
-} from "modules/main/command/projections/tg-source";
+import { TgSourceId } from "modules/main/command/projections/tg-source";
 import { TgSourceParticipantDS } from "modules/main/command/projections/tg-source-participant";
 import { TgSourceParticipantWithStatusDS } from "modules/main/command/projections/tg-source-participant-with-status";
+import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import {
   TgUser,
   TgUserDS,

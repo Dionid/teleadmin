@@ -1,10 +1,8 @@
 import { Command, CommandFactory } from "fdd-ts/cqrs";
 import { NotFoundError } from "fdd-ts/errors";
 import { TelegramClientRef } from "libs/telegram-js/client";
-import {
-  TgSourceDS,
-  TgSourceId,
-} from "modules/main/command/projections/tg-source";
+import { TgSourceId } from "modules/main/command/projections/tg-source";
+import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import { Api } from "telegram";
 
 import PeerChannel = Api.PeerChannel;

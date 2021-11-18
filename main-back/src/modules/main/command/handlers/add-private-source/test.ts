@@ -8,10 +8,8 @@ import {
   AddPrivateSourceCmd,
   AddPrivateSourceCmdHandler,
 } from "modules/main/command/handlers/add-private-source/index";
-import {
-  TgSourceDS,
-  TgSourceType,
-} from "modules/main/command/projections/tg-source";
+import { TgSourceType } from "modules/main/command/projections/tg-source";
+import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import { Api, TelegramClient } from "telegram";
 
 import Updates = Api.Updates;

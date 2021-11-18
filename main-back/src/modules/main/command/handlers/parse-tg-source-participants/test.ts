@@ -15,12 +15,12 @@ import {
 import { TgSourceParticipantStatusDS } from "modules/main/command/projections/tg-participant-status";
 import {
   TgSource,
-  TgSourceDS,
   TgSourceId,
   TgSourceTgId,
 } from "modules/main/command/projections/tg-source";
 import { TgSourceParticipantDS } from "modules/main/command/projections/tg-source-participant";
 import { TgSourceParticipantWithStatusDS } from "modules/main/command/projections/tg-source-participant-with-status";
+import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import {
   TgUser,
   TgUserDS,

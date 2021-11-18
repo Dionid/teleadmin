@@ -7,11 +7,11 @@ import { TelegramClientRef } from "libs/telegram-js/client";
 import { PublicSourceAddedEvent } from "modules/main/command/handlers/add-public-source/events";
 import {
   TgSource,
-  TgSourceDS,
   TgSourceId,
   TgSourceTgId,
   TgSourceType,
 } from "modules/main/command/projections/tg-source";
+import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import { Api } from "telegram";
 
 import Channel = Api.Channel;

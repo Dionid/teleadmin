@@ -1,5 +1,3 @@
-import { UUID } from "fdd-ts/fop-utils";
-import { BrandedPrimitive } from "functional-oriented-programming-ts/branded";
 import { Knex } from "knex";
 import {
   TgSourceParticipantStatusTable,
@@ -8,28 +6,13 @@ import {
   TgSourceParticipantTableName,
 } from "libs/main-db/models";
 import { TgSourceId } from "modules/main/command/projections/tg-source";
+import {
+  TgSourceParticipant,
+  TgSourceParticipantId,
+} from "modules/main/command/projections/tg-source-participant/projection";
 import { TgUserId } from "modules/main/command/projections/tg-user";
 
-export type TgSourceParticipantId = BrandedPrimitive<
-  UUID,
-  { readonly MemberId: unique symbol }
->;
-export const TgSourceParticipantId = {
-  new: () => {
-    return UUID.create() as TgSourceParticipantId;
-  },
-  ofString: (value: string) => {
-    return UUID.ofString(value) as TgSourceParticipantId;
-  },
-};
-
-export type TgSourceParticipant = TgSourceParticipantTable & {
-  id: TgSourceParticipantId;
-  tgUserId: TgUserId;
-  tgSourceId: TgSourceId;
-};
-
-const TgSourceParticipantDM = {
+export const TgSourceParticipantDM = {
   fromTableData: (tableData: TgSourceParticipantTable): TgSourceParticipant => {
     return {
       ...tableData,
@@ -39,7 +22,6 @@ const TgSourceParticipantDM = {
     };
   },
 };
-
 export type TgSourceParticipantDS = ReturnType<typeof TgSourceParticipantDS>;
 
 export const TgSourceParticipantDS = (knex: Knex) => {

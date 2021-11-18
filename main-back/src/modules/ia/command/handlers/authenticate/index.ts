@@ -1,6 +1,6 @@
 import { CommandFactory, Hybrid } from "fdd-ts/cqrs";
 import { JWTToken } from "libs/teleadmin/jwt-token";
-import { CommonDS } from "modules/ia/command/projections";
+import { IAModuleDS } from "modules/ia/command/projections";
 import {
   UserDS,
   UserEmail,
@@ -28,7 +28,7 @@ export const AuthenticateCmd = CommandFactory("AuthenticateCmd");
 export type AuthenticateCmdHandler = ReturnType<typeof AuthenticateCmdHandler>;
 
 export const AuthenticateCmdHandler =
-  (salt: string, commonDS: CommonDS) => async (cmd: AuthenticateCmd) => {
+  (salt: string, commonDS: IAModuleDS) => async (cmd: AuthenticateCmd) => {
     // . Get user
     const user = await UserDS.findByEmail(commonDS, cmd.data.email);
 

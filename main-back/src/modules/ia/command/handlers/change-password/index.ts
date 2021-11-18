@@ -1,6 +1,6 @@
 import { Command } from "fdd-ts/cqrs";
 import { CriticalError } from "fdd-ts/errors";
-import { CommonDS } from "modules/ia/command/projections";
+import { IAModuleDS } from "modules/ia/command/projections";
 import {
   UserDS,
   User,
@@ -18,7 +18,7 @@ export type ChangePasswordCmd = Command<
 >;
 
 export const ChangePasswordCmdHandler =
-  (commonDS: CommonDS) => async (cmd: ChangePasswordCmd) => {
+  (commonDS: IAModuleDS) => async (cmd: ChangePasswordCmd) => {
     // . Get user
     const user = await UserDS.findById(commonDS, cmd.data.id);
 

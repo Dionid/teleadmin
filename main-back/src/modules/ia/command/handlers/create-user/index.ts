@@ -1,6 +1,6 @@
 import { Command, CommandFactory } from "fdd-ts/cqrs";
 import { PublicError } from "fdd-ts/errors";
-import { CommonDS } from "modules/ia/command/projections";
+import { IAModuleDS } from "modules/ia/command/projections";
 import {
   UserDS,
   User,
@@ -20,7 +20,7 @@ export const CreateUserCmd = CommandFactory("CreateUserCmd");
 export type CreateUserCmdHandler = ReturnType<typeof CreateUserCmdHandler>;
 
 export const CreateUserCmdHandler =
-  (commonDS: CommonDS) => async (cmd: CreateUserCmd) => {
+  (commonDS: IAModuleDS) => async (cmd: CreateUserCmd) => {
     const newUser = User.newUnactivatedUser(cmd.data.email, cmd.data.password);
 
     try {

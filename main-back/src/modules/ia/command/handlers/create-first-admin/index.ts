@@ -1,5 +1,5 @@
 import { Command, CommandFactory } from "fdd-ts/cqrs";
-import { CommonDS } from "modules/ia/command/projections";
+import { IAModuleDS } from "modules/ia/command/projections";
 import {
   UserDS,
   User,
@@ -23,7 +23,7 @@ export type CreateFirstAdminCmdHandler = ReturnType<
 >;
 
 export const CreateFirstAdminCmdHandler =
-  (commonDS: CommonDS) => async (cmd: CreateFirstAdminCmd) => {
+  (commonDS: IAModuleDS) => async (cmd: CreateFirstAdminCmd) => {
     const user = await UserDS.findAny(commonDS);
 
     if (user) {

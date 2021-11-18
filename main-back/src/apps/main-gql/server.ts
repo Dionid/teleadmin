@@ -23,12 +23,11 @@ import { CreateAndSetMainApplicationCmdHandler } from "modules/main/command/hand
 import { CreateAndSetMasterHomunculusCmdHandler } from "modules/main/command/handlers/create-and-set-main-homunculus";
 import { LeaveAndDeleteSourceCmdHandler } from "modules/main/command/handlers/leave-and-delete-source";
 import { ParseTgSourceParticipantsCmdHandler } from "modules/main/command/handlers/parse-tg-source-participants";
-import { TgApplicationDS } from "modules/main/command/projections/tg-application";
 import { TgHomunculusDS } from "modules/main/command/projections/tg-homunculus";
 import { TgSourceParticipantStatusDS } from "modules/main/command/projections/tg-participant-status";
-import { TgSourceDS } from "modules/main/command/projections/tg-source";
 import { TgSourceParticipantDS } from "modules/main/command/projections/tg-source-participant";
 import { TgSourceParticipantWithStatusDS } from "modules/main/command/projections/tg-source-participant-with-status";
+import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import { TgUserDS } from "modules/main/command/projections/tg-user";
 import { Logger } from "winston";
 
@@ -73,7 +72,6 @@ export const initServer = (
       const txEventBus = await eventBus.tx();
 
       // . DS
-      const tgApplicationDS = TgApplicationDS(tx);
       const homunculusDS = TgHomunculusDS({
         knex: tx,
       });
@@ -107,7 +105,7 @@ export const initServer = (
       const authenticate = AuthenticateCmdHandler(jwtSecret, baseDS);
       const createAndSetMainApplicationCmdHandler = pipeAsync(
         isAuthenticatedAndNotDemoAspect,
-        CreateAndSetMainApplicationCmdHandler(tgApplicationDS)
+        CreateAndSetMainApplicationCmdHandler(baseDS)
       );
 
       const createAndSetMasterHomunculusCmdHandler = pipeAsync(
