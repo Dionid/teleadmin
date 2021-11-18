@@ -1,8 +1,8 @@
 import { Command, CommandFactory } from "fdd-ts/cqrs";
-import { EventBusService } from "fdd-ts/eda";
+import { EventBus } from "fdd-ts/eda";
 import { NotFoundError } from "fdd-ts/errors";
 import { NotEmptyString } from "functional-oriented-programming-ts/branded";
-import { AuthTokenToHomunculusSet } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
+import { AuthTokenToHomunculusSetEvent } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
 import {
   TgHomunculusDS,
   TgHomunculusPhone,
@@ -20,7 +20,7 @@ export const SetAuthTokenToHomunculusCmd =
   CommandFactory<SetAuthTokenToHomunculusCmd>("SetAuthTokenToHomunculusCmd");
 
 export const SetAuthTokenToHomunculusCmdHandler =
-  (tgHomunculusDS: TgHomunculusDS, eventBus: EventBusService) =>
+  (tgHomunculusDS: TgHomunculusDS, eventBus: EventBus) =>
   async (cmd: SetAuthTokenToHomunculusCmd) => {
     // . Find Homunculus by phone
     const homunculus = await tgHomunculusDS.getByPhone(cmd.data.phone);
@@ -38,15 +38,15 @@ export const SetAuthTokenToHomunculusCmdHandler =
     await tgHomunculusDS.update(homunculus);
 
     // . Send Event
-    const event: AuthTokenToHomunculusSet = {
-      type: "AuthTokenToHomunculusSet",
+    const event: AuthTokenToHomunculusSetEvent = {
+      type: "AuthTokenToHomunculusSetEvent",
       version: "v1",
       data: {
         authToken: homunculus.authToken,
       },
     };
 
-    eventBus.publish([
+    EventBus.publish(eventBus, [
       {
         ...event,
         meta: {

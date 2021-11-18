@@ -127,7 +127,7 @@ export const ParseTgSourceParticipantsCmdHandler =
 
     eventBus.publish([
       FullEvent.fromCmdOrQuery({
-        event: TgSourceParticipantsParsedEvent.new({}),
+        event: TgSourceParticipantsParsedEvent.create({}),
         meta: cmd.meta,
       }),
     ]);

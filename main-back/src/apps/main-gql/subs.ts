@@ -1,6 +1,6 @@
 import { TgClientConnectedEvent } from "apps/main-gql/set-tg-client";
 import { CronJob } from "cron";
-import { Event, EventBusService, EventFactory } from "fdd-ts/eda";
+import { Event, EventBus, EventBehaviour } from "fdd-ts/eda";
 import { NotFoundError } from "fdd-ts/errors";
 import { Knex } from "knex";
 import { TelegramClientRef } from "libs/telegram-js/client";
@@ -8,7 +8,7 @@ import {
   ParseInfoAboutHomunculusCmd,
   ParseInfoAboutHomunculusCmdHandler,
 } from "modules/main/command/handlers/parse-info-about-homunculus";
-import { AuthTokenToHomunculusSet } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
+import { AuthTokenToHomunculusSetEvent } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
 import { TgUserDS } from "modules/main/command/projections/tg-user";
 import { Logger } from "winston";
 
@@ -18,20 +18,21 @@ export type CronSourcesParsingCompletedEvent = Event<
   Record<any, any>
 >;
 export const CronSourcesParsingCompletedEvent =
-  EventFactory.new<CronSourcesParsingCompletedEvent>(
+  EventBehaviour.create<CronSourcesParsingCompletedEvent>(
     "CronSourcesParsingCompletedEvent",
     "v1"
   );
 
 export const subscribeOnEvents = (
   logger: Logger,
-  eventBus: EventBusService,
+  eventBus: EventBus,
   knex: Knex,
   setTgClient: () => void,
   clientRef: TelegramClientRef,
   job: CronJob
 ) => {
-  eventBus.subscribe<TgClientConnectedEvent>(
+  EventBus.subscribe<TgClientConnectedEvent>(
+    eventBus,
     TgClientConnectedEvent.type,
     async (event) => {
       await knex.transaction(async (tx) => {
@@ -43,8 +44,9 @@ export const subscribeOnEvents = (
       job.start();
     }
   );
-  eventBus.subscribe<AuthTokenToHomunculusSet>(
-    "AuthTokenToHomunculusSet",
+  EventBus.subscribe<AuthTokenToHomunculusSetEvent>(
+    eventBus,
+    "AuthTokenToHomunculusSetEvent",
     async (event) => {
       try {
         await setTgClient();

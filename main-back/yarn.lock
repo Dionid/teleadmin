@@ -3453,10 +3453,15 @@ fbjs@^3.0.0:
     setimmediate "^1.0.5"
     ua-parser-js "^0.7.30"
 
-fdd-ts@0.0.6:
+fdd-ts@/Users/shrooms/Projects/DS/CodeMeBitch/libs/@fdd:
   version "0.0.6"
-  resolved "https://registry.yarnpkg.com/fdd-ts/-/fdd-ts-0.0.6.tgz#9369cf8694552a62bee03e863df8f9c215a2f4b0"
-  integrity sha512-W6eHp49G68+OeENf1ZyQ1nVtYq9Gxe2gGORRxioPBVnqR/lhzRg6vP2xqY80sA6gd+kcFu//thYbj/p0FeQvRQ==
+  dependencies:
+    functional-oriented-programming-ts "^0.0.12"
+    knex "^0.95.14"
+    uuid "^8.3.2"
+
+"fdd-ts@file:../../libs/@fdd":
+  version "0.0.6"
   dependencies:
     functional-oriented-programming-ts "^0.0.12"
     knex "^0.95.14"

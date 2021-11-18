@@ -1,4 +1,4 @@
-import { Event, EventFactory } from "fdd-ts/eda/events";
+import { Event, EventBehaviour } from "fdd-ts/eda/events";
 
 export type TgSourceParticipantsParsedEvent = Event<
   "TgSourceParticipantsParsedEvent",
@@ -6,7 +6,7 @@ export type TgSourceParticipantsParsedEvent = Event<
   Record<any, any>
 >;
 export const TgSourceParticipantsParsedEvent =
-  EventFactory.new<TgSourceParticipantsParsedEvent>(
+  EventBehaviour.create<TgSourceParticipantsParsedEvent>(
     "TgSourceParticipantsParsedEvent",
     "v1"
   );

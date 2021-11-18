@@ -89,7 +89,7 @@ const sourceWasDeleted = async (
   await tgSourceDS.update(updatedDeletedSource);
 
   // . Success
-  const event = PublicSourceAddedEvent.new({
+  const event = PublicSourceAddedEvent.create({
     id: updatedDeletedSource.id,
     tgId: updatedDeletedSource.tgId,
     tgName: updatedDeletedSource.tgName,
@@ -152,7 +152,7 @@ const sourceIsNew = async (
   await tgSourceDS.create(newSource);
 
   // . Success
-  const event = PublicSourceAddedEvent.new({
+  const event = PublicSourceAddedEvent.create({
     id: newSource.id,
     tgId: newSource.tgId,
     tgName: newSource.tgName,

@@ -55,7 +55,7 @@ export const initCronJobs = (
     );
     await eventBus.publish([
       FullEvent.fromEvent({
-        event: CronSourcesParsingCompletedEvent.new({}),
+        event: CronSourcesParsingCompletedEvent.create({}),
         userId: null, // TODO. Change to server userid
       }),
     ]);

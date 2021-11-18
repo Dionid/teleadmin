@@ -138,7 +138,7 @@ export const AddPrivateSourceCmdHandler =
       throwOnJoinChannelError,
       checkThatUpdates,
       getGullChannel(client.ref),
-      (res: ChatFull | Error) => throwOnError(res),
+      throwOnError,
       createSource(tgSourceDS, cmd.data.sourceType),
       (event: Event<any, any, any>) => [
         FullEvent.fromCmdOrQuery({ event, meta: cmd.meta }),

@@ -32,7 +32,7 @@
     "apollo-server": "^3.4.0",
     "cron": "^1.8.2",
     "dotenv": "^10.0.0",
-    "fdd-ts": "0.0.6",
+    "fdd-ts": "/Users/shrooms/Projects/DS/CodeMeBitch/libs/@fdd",
     "fp-ts": "^2.11.5",
     "functional-oriented-programming-ts": "^0.0.13",
     "graphql": "^15.6.1",

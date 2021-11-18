@@ -4,7 +4,11 @@ import { initServer } from "apps/main-gql/server";
 import { initTgClient } from "apps/main-gql/set-tg-client";
 import { subscribeOnEvents } from "apps/main-gql/subs";
 import * as dotenv from "dotenv";
-import { EventBusInMemoryService } from "fdd-ts/eda-in-memory";
+import { EventBus } from "fdd-ts/eda";
+import {
+  EventBusInMemory,
+  EventBusInMemoryService,
+} from "fdd-ts/eda-in-memory";
 import * as Env from "fdd-ts/env";
 import { NotFoundError } from "fdd-ts/errors";
 import * as KnexUtils from "fdd-ts/knex-utils";
@@ -30,18 +34,13 @@ const main = async () => {
         ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
     )
   );
-  // const prodFormat = winston.format.json()
 
   // . Logger
   const logger = winston.createLogger({
     level: "debug",
     format: devFormat,
     defaultMeta: { service: "teleadmin-main-gql" },
-    transports: [
-      new winston.transports.Console(),
-      // new winston.transports.File({ filename: 'error.log', level: 'error' }),
-      // new winston.transports.File({ filename: 'combined.log' }),
-    ],
+    transports: [new winston.transports.Console()],
   });
 
   // ENV const
@@ -72,7 +71,7 @@ const main = async () => {
   });
 
   // . EDA
-  const eventBus = EventBusInMemoryService.create({
+  const eventBusService = EventBusInMemoryService.create({
     persistor: eventBusPersistorService,
     tx: false,
     onError: (e) => {
@@ -81,13 +80,25 @@ const main = async () => {
     log: logger.debug,
   });
 
+  const eventBus = EventBus.create(
+    EventBusInMemory.create({
+      persistor: eventBusPersistorService,
+      tx: false,
+      onError: (e) => {
+        logger.error(e);
+      },
+      log: logger.debug,
+    }),
+    EventBusInMemory
+  );
+
   const [telegramClientRef, setTgClient] = initTgClient(pg, eventBus);
 
   const { parseSourcesJob } = initCronJobs(
     pg,
     logger,
     telegramClientRef,
-    eventBus
+    eventBusService
   );
 
   // . INTERNAL SUBSCRIBE
@@ -106,7 +117,7 @@ const main = async () => {
   // . SERVER
   const server = initServer(
     logger,
-    eventBus,
+    eventBusService,
     pg,
     telegramClientRef,
     jwtSecret,
