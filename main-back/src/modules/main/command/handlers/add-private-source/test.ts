@@ -43,7 +43,7 @@ describe("AddPrivateSourceCmdHandler", () => {
     sourceInviteLinkHash = TgSourceInviteLinkHash.ofString("");
     sourceType = TgSourceType.fromString("Channel");
 
-    cmd = AddPrivateSourceCmd.new(
+    cmd = AddPrivateSourceCmd.create(
       {
         sourceInviteLinkHash,
         sourceType,

@@ -39,7 +39,7 @@ export const subscribeOnEvents = (
         await ParseInfoAboutHomunculusCmdHandler(
           clientRef,
           TgUserDS(tx)
-        )(ParseInfoAboutHomunculusCmd.new({}, { userId: null }));
+        )(ParseInfoAboutHomunculusCmd.create({}, { userId: null }));
       });
       job.start();
     }

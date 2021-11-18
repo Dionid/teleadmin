@@ -26,7 +26,7 @@ export const initCronJobs = (
       sources.map(async (source) => {
         logger.debug("SOURCE PARSING FIRED");
         const cmd: ParseTgSourceParticipantsCmd =
-          ParseTgSourceParticipantsCmd.new(
+          ParseTgSourceParticipantsCmd.create(
             {
               sourceId: source.id,
             },

@@ -12,7 +12,7 @@ export type TgHomunculusId = BrandedPrimitive<
 >;
 export const TgHomunculusId = {
   new: () => {
-    return UUID.new() as TgHomunculusId;
+    return UUID.create() as TgHomunculusId;
   },
   ofString: (value: string) => {
     return UUID.ofString(value) as TgHomunculusId;

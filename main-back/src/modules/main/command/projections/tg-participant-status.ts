@@ -10,7 +10,7 @@ export type TgSourceParticipantStatusId = BrandedPrimitive<
 >;
 export const TgSourceParticipantStatusId = {
   new: () => {
-    return UUID.new() as TgSourceParticipantStatusId;
+    return UUID.create() as TgSourceParticipantStatusId;
   },
   ofString: (value: string) => {
     return UUID.ofString(value) as TgSourceParticipantStatusId;

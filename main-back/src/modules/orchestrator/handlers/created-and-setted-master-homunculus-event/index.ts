@@ -90,7 +90,7 @@ export const initCreatedAndSettedMasterHomunculusEventHandler = (
           }),
           eventBus
         )(
-          SetAuthTokenToHomunculusCmd.new(
+          SetAuthTokenToHomunculusCmd.create(
             {
               phone: event.data.phone,
               authToken,

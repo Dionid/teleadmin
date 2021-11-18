@@ -25,7 +25,7 @@ import { v4 } from "uuid";
 
 export const Mutation: MutationResolvers<ResolversCtx> = {
   createFirstAdmin: async (parent, args, ctx) => {
-    const cmd = CreateFirstAdminCmd.new(
+    const cmd = CreateFirstAdminCmd.create(
       {
         email: UserEmail.ofString(args.req.email),
         password: UserHashedPassword.ofString(
@@ -45,7 +45,7 @@ export const Mutation: MutationResolvers<ResolversCtx> = {
     };
   },
   createUser: async (parent, args, ctx) => {
-    const cmd = CreateUserCmd.new(
+    const cmd = CreateUserCmd.create(
       {
         email: UserEmail.ofString(args.req.email),
         password: UserHashedPassword.ofString(
@@ -65,7 +65,7 @@ export const Mutation: MutationResolvers<ResolversCtx> = {
     };
   },
   authenticate: async (parent, args, ctx) => {
-    const cmd = AuthenticateCmd.new(
+    const cmd = AuthenticateCmd.create(
       {
         email: UserEmail.ofString(args.req.email),
         password: UserHashedPassword.ofString(
@@ -83,7 +83,7 @@ export const Mutation: MutationResolvers<ResolversCtx> = {
 
   createAndSetMasterHomunculus: async (parent, args, ctx) => {
     const cmd: CreateAndSetMasterHomunculusCmd =
-      CreateAndSetMasterHomunculusCmd.new(
+      CreateAndSetMasterHomunculusCmd.create(
         {
           phone: TgHomunculusPhone.ofString(args.req.phone),
         },
@@ -101,7 +101,7 @@ export const Mutation: MutationResolvers<ResolversCtx> = {
 
   createAndSetMainApplication: async (parent, args, ctx) => {
     const cmd: CreateAndSetMainApplicationCmd =
-      CreateAndSetMainApplicationCmd.new(
+      CreateAndSetMainApplicationCmd.create(
         {
           name: NotEmptyString.ofString(args.req.name),
           appId: NotEmptyString.ofString(args.req.appId),
@@ -147,7 +147,7 @@ export const Mutation: MutationResolvers<ResolversCtx> = {
   },
 
   addPublicSource: async (parent, args, ctx) => {
-    const cmd: AddPublicSourceCmd = AddPublicSourceCmd.new(
+    const cmd: AddPublicSourceCmd = AddPublicSourceCmd.create(
       {
         sourceName: NotEmptyString.ofString(args.req.name),
         sourceType: TgSourceType.fromString(args.req.type),
@@ -165,7 +165,7 @@ export const Mutation: MutationResolvers<ResolversCtx> = {
   },
 
   addPrivateSource: async (parent, args, ctx) => {
-    const cmd = AddPrivateSourceCmd.new(
+    const cmd = AddPrivateSourceCmd.create(
       {
         sourceInviteLinkHash: TgSourceInviteLinkHash.ofString(
           args.req.inviteLink
@@ -185,14 +185,15 @@ export const Mutation: MutationResolvers<ResolversCtx> = {
   },
 
   parseTgSourceParticipants: async (parent, args, ctx) => {
-    const cmd: ParseTgSourceParticipantsCmd = ParseTgSourceParticipantsCmd.new(
-      {
-        sourceId: TgSourceId.ofString(args.req.sourceId),
-      },
-      {
-        userId: ctx.userId,
-      }
-    );
+    const cmd: ParseTgSourceParticipantsCmd =
+      ParseTgSourceParticipantsCmd.create(
+        {
+          sourceId: TgSourceId.ofString(args.req.sourceId),
+        },
+        {
+          userId: ctx.userId,
+        }
+      );
 
     await ctx.modules.main.commands.parseTgSourceParticipantsCmdHandler(cmd);
 
@@ -202,7 +203,7 @@ export const Mutation: MutationResolvers<ResolversCtx> = {
   },
 
   leaveAndDeleteSource: async (parent, args, ctx) => {
-    const cmd: LeaveAndDeleteSourceCmd = LeaveAndDeleteSourceCmd.new(
+    const cmd: LeaveAndDeleteSourceCmd = LeaveAndDeleteSourceCmd.create(
       {
         sourceId: TgSourceId.ofString(args.req.sourceId),
       },

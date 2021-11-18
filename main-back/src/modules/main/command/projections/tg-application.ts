@@ -13,7 +13,7 @@ export type TgApplicationId = BrandedPrimitive<
 >;
 export const TgApplicationId = {
   new: () => {
-    return UUID.new() as TgApplicationId;
+    return UUID.create() as TgApplicationId;
   },
   ofString: (value: string) => {
     return UUID.ofString(value) as TgApplicationId;

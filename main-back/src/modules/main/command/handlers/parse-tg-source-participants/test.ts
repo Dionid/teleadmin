@@ -76,7 +76,7 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
     tgSourceDS = mock<TgSourceDS>();
     tgSourceParticipantStatusDS = mock<TgSourceParticipantStatusDS>();
     tgSourceParticipantWithStatusDS = mock<TgSourceParticipantWithStatusDS>();
-    cmd = ParseTgSourceParticipantsCmd.new(
+    cmd = ParseTgSourceParticipantsCmd.create(
       {
         sourceId: TgSourceId.new(),
       },
