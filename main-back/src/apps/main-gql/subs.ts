@@ -9,7 +9,6 @@ import {
   ParseInfoAboutHomunculusCmdHandler,
 } from "modules/main/command/handlers/parse-info-about-homunculus";
 import { AuthTokenToHomunculusSetEvent } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
-import { TgUserDS } from "modules/main/command/projections/tg-user";
 import { Logger } from "winston";
 
 export type CronSourcesParsingCompletedEvent = Event<
@@ -36,10 +35,10 @@ export const subscribeOnEvents = (
     TgClientConnectedEvent.type,
     async (event) => {
       await knex.transaction(async (tx) => {
-        await ParseInfoAboutHomunculusCmdHandler(
-          clientRef,
-          TgUserDS(tx)
-        )(ParseInfoAboutHomunculusCmd.create({}, { userId: null }));
+        await ParseInfoAboutHomunculusCmdHandler(clientRef, {
+          knex: tx,
+          logger,
+        })(ParseInfoAboutHomunculusCmd.create({}, { userId: null }));
       });
       job.start();
     }

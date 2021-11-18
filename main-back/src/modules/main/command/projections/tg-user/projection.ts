@@ -13,7 +13,7 @@ export type TgUserId = BrandedPrimitive<
   { readonly TgUserId: unique symbol }
 >;
 export const TgUserId = {
-  new: () => {
+  create: () => {
     return UUID.create() as TgUserId;
   },
   ofString: (value: string) => {
@@ -45,9 +45,9 @@ export type TgUser = TgUserTable & {
   tgPhone: NotEmptyString | null;
 };
 export const TgUser = {
-  newFromTgApiUser: (user: Api.User): TgUser => {
+  createFromTgApiUser: (user: Api.User): TgUser => {
     return {
-      id: TgUserId.new(),
+      id: TgUserId.create(),
       tgId: TgUserTgId.ofString(user.id),
       tgUsername: !user.username
         ? null

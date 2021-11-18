@@ -1,6 +1,7 @@
 import { Command, CommandFactory } from "fdd-ts/cqrs";
 import { NotFoundError } from "fdd-ts/errors";
 import { TelegramClientRef } from "libs/telegram-js/client";
+import { MainModuleDS } from "modules/main/command/projections";
 import { TgSourceId } from "modules/main/command/projections/tg-source";
 import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import { Api } from "telegram";
@@ -18,10 +19,13 @@ export const LeaveAndDeleteSourceCmd = CommandFactory<LeaveAndDeleteSourceCmd>(
 );
 
 export const LeaveAndDeleteSourceCmdHandler =
-  (client: TelegramClientRef, tgSourceDS: TgSourceDS) =>
+  (client: TelegramClientRef, ds: MainModuleDS) =>
   async (cmd: LeaveAndDeleteSourceCmd) => {
     // . Get source
-    const source = await tgSourceDS.findByIdAndNotDeleted(cmd.data.sourceId);
+    const source = await TgSourceDS.findByIdAndNotDeleted(
+      ds,
+      cmd.data.sourceId
+    );
 
     if (!source) {
       throw new NotFoundError(`Source not found`);
@@ -37,5 +41,5 @@ export const LeaveAndDeleteSourceCmdHandler =
     );
 
     // . Delete source
-    await tgSourceDS.delete(source);
+    await TgSourceDS.remove(ds, source);
   };

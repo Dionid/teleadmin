@@ -9,7 +9,7 @@ export type TgSourceParticipantId = BrandedPrimitive<
   { readonly MemberId: unique symbol }
 >;
 export const TgSourceParticipantId = {
-  new: () => {
+  create: () => {
     return UUID.create() as TgSourceParticipantId;
   },
   ofString: (value: string) => {

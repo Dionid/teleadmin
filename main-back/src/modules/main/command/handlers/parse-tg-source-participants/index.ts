@@ -11,10 +11,8 @@ import {
   tgUserDoesntExist,
   tgUserExist,
 } from "modules/main/command/handlers/parse-tg-source-participants/operations/user-presence";
-import { TgSourceParticipantStatusDS } from "modules/main/command/projections/tg-participant-status";
+import { MainModuleDS } from "modules/main/command/projections";
 import { TgSourceId } from "modules/main/command/projections/tg-source";
-import { TgSourceParticipantDS } from "modules/main/command/projections/tg-source-participant";
-import { TgSourceParticipantWithStatusDS } from "modules/main/command/projections/tg-source-participant-with-status";
 import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import {
   TgUser,
@@ -57,15 +55,14 @@ export const ParseTgSourceParticipantsCmdHandler =
     logger: Logger,
     client: TelegramClientRef,
     eventBus: EventBusService,
-    tgUserDS: TgUserDS,
-    tgSourceParticipantDS: TgSourceParticipantDS,
-    tgSourceDS: TgSourceDS,
-    tgSourceParticipantStatusDS: TgSourceParticipantStatusDS,
-    tgSourceParticipantWithStatusDS: TgSourceParticipantWithStatusDS
+    ds: MainModuleDS
   ) =>
   async (cmd: ParseTgSourceParticipantsCmd) => {
     // . Check that TgSource is exist
-    const source = await tgSourceDS.findByIdAndNotDeleted(cmd.data.sourceId);
+    const source = await TgSourceDS.findByIdAndNotDeleted(
+      ds,
+      cmd.data.sourceId
+    );
 
     if (!source) {
       throw new NotFoundError(
@@ -91,37 +88,21 @@ export const ParseTgSourceParticipantsCmdHandler =
     // . Parse
     const tgUsers: TgUser[] = await Promise.all(
       tgAllParticipants.users.filter(isUser(logger)).map(async (user) => {
-        const tgUser = await tgUserDS.findByTgId(TgUserTgId.ofString(user.id));
+        const tgUser = await TgUserDS.findByTgId(
+          ds,
+          TgUserTgId.ofString(user.id)
+        );
 
         if (!tgUser) {
-          return await tgUserDoesntExist(
-            tgUserDS,
-            user,
-            source.id,
-            tgSourceParticipantDS,
-            tgSourceParticipantStatusDS
-          );
+          return await tgUserDoesntExist(ds, user, source.id);
         }
 
-        return await tgUserExist(
-          tgUserDS,
-          tgSourceParticipantWithStatusDS,
-          tgSourceParticipantDS,
-          tgSourceParticipantStatusDS,
-          tgUser,
-          user,
-          source
-        );
+        return await tgUserExist(ds, tgUser, user, source);
       })
     );
 
     // . Get all participants not in this list & status "Joined" | "Rejoined" -> "Left"
-    await markLeftParticipants(
-      tgSourceParticipantDS,
-      tgSourceParticipantStatusDS,
-      tgUsers,
-      source
-    );
+    await markLeftParticipants(ds, tgUsers, source);
 
     eventBus.publish([
       FullEvent.fromCmdOrQuery({

@@ -12,14 +12,12 @@ import {
   tgUserDoesntExist,
   tgUserExist,
 } from "modules/main/command/handlers/parse-tg-source-participants/operations/user-presence";
-import { TgSourceParticipantStatusDS } from "modules/main/command/projections/tg-participant-status";
+import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgSource,
   TgSourceId,
   TgSourceTgId,
 } from "modules/main/command/projections/tg-source";
-import { TgSourceParticipantDS } from "modules/main/command/projections/tg-source-participant";
-import { TgSourceParticipantWithStatusDS } from "modules/main/command/projections/tg-source-participant-with-status";
 import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import {
   TgUser,
@@ -36,6 +34,7 @@ import ChannelParticipants = Api.channels.ChannelParticipants;
 import ChatPhoto = Api.ChatPhoto;
 import Channel = Api.Channel;
 import User = Api.User;
+import clearAllMocks = jest.clearAllMocks;
 
 jest.mock("libs/telegram-js/check-if-me-is-channel-admin");
 jest.mock("libs/telegram-js/get-channel-partisipants");
@@ -45,12 +44,16 @@ jest.mock(
 jest.mock(
   "modules/main/command/handlers/parse-tg-source-participants/operations/mark-left-participants"
 );
+jest.mock("modules/main/command/projections/tg-source/ds");
+jest.mock("modules/main/command/projections/tg-user/ds");
 
 const mockedCheckIfMeIsChannelAdmin = mocked(checkIfMeIsChannelAdmin);
 const mockedGetAllChannelParticipants = mocked(getAllChannelParticipants);
 const mockedTgUserDoesntExist = mocked(tgUserDoesntExist);
 const mockedTgUserExist = mocked(tgUserExist);
 const mockedMarkLeftParticipants = mocked(markLeftParticipants);
+const mockedTgSourceDS = mocked(TgSourceDS);
+const mockedTgUserDS = mocked(TgUserDS);
 
 describe("ParseTgSourceParticipantsCmdHandler", () => {
   let logger: MockProxy<Logger>;
@@ -58,12 +61,8 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
     ref: MockProxy<TelegramClient>;
   };
   let eventBus: MockProxy<EventBusService>;
-  let tgUserDS: MockProxy<TgUserDS>;
-  let tgSourceParticipantDS: MockProxy<TgSourceParticipantDS>;
-  let tgSourceDS: MockProxy<TgSourceDS>;
-  let tgSourceParticipantStatusDS: MockProxy<TgSourceParticipantStatusDS>;
-  let tgSourceParticipantWithStatusDS: MockProxy<TgSourceParticipantWithStatusDS>;
   let cmd: ParseTgSourceParticipantsCmd;
+  let ds: MockProxy<MainModuleDS>;
 
   beforeEach(() => {
     logger = mock<Logger>();
@@ -71,22 +70,15 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
       ref: mock<TelegramClient>(),
     };
     eventBus = mock<EventBusService>();
-    tgUserDS = mock<TgUserDS>();
-    tgSourceParticipantDS = mock<TgSourceParticipantDS>();
-    tgSourceDS = mock<TgSourceDS>();
-    tgSourceParticipantStatusDS = mock<TgSourceParticipantStatusDS>();
-    tgSourceParticipantWithStatusDS = mock<TgSourceParticipantWithStatusDS>();
+    ds = mock<MainModuleDS>();
     cmd = ParseTgSourceParticipantsCmd.create(
       {
         sourceId: TgSourceId.new(),
       },
       { userId: null }
     );
-    mockedCheckIfMeIsChannelAdmin.mockClear();
-    mockedGetAllChannelParticipants.mockClear();
-    mockedTgUserDoesntExist.mockClear();
-    mockedTgUserExist.mockClear();
-    mockedMarkLeftParticipants.mockClear();
+
+    clearAllMocks();
   });
 
   describe("success", () => {
@@ -114,7 +106,7 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
         deletedAt: null,
       };
 
-      tgSourceDS.findByIdAndNotDeleted.mockReturnValue(
+      mockedTgSourceDS.findByIdAndNotDeleted.mockReturnValue(
         new Promise<TgSource | undefined>((resolve) => {
           resolve(source);
         })
@@ -160,11 +152,7 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
         logger,
         client,
         eventBus,
-        tgUserDS,
-        tgSourceParticipantDS,
-        tgSourceDS,
-        tgSourceParticipantStatusDS,
-        tgSourceParticipantWithStatusDS
+        ds
       );
 
       expect(await handler(cmd)).toBeUndefined();
@@ -198,7 +186,7 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
         deletedAt: null,
       };
       const tgUser: TgUser = {
-        id: TgUserId.new(),
+        id: TgUserId.create(),
         tgId: TgUserTgId.ofString(123),
         tgUsername: null,
         tgPhone: null,
@@ -214,7 +202,7 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
         tgLangCode: null,
       };
 
-      tgSourceDS.findByIdAndNotDeleted.mockReturnValue(
+      mockedTgSourceDS.findByIdAndNotDeleted.mockReturnValue(
         new Promise<TgSource | undefined>((resolve) => {
           resolve(source);
         })
@@ -256,21 +244,19 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
         })
       );
 
-      tgUserDS.findByTgId.calledWith(TgUserTgId.ofString(123)).mockReturnValue(
-        new Promise<TgUser | undefined>((resolve) => {
-          resolve(tgUser);
-        })
-      );
+      mockedTgUserDS.findByTgId.mockImplementation(async (ds, tgId) => {
+        if (tgId === TgUserTgId.ofString(123)) {
+          return tgUser;
+        }
+
+        return undefined;
+      });
 
       const handler = ParseTgSourceParticipantsCmdHandler(
         logger,
         client,
         eventBus,
-        tgUserDS,
-        tgSourceParticipantDS,
-        tgSourceDS,
-        tgSourceParticipantStatusDS,
-        tgSourceParticipantWithStatusDS
+        ds
       );
 
       expect(await handler(cmd)).toBeUndefined();

@@ -23,12 +23,6 @@ import { CreateAndSetMainApplicationCmdHandler } from "modules/main/command/hand
 import { CreateAndSetMasterHomunculusCmdHandler } from "modules/main/command/handlers/create-and-set-main-homunculus";
 import { LeaveAndDeleteSourceCmdHandler } from "modules/main/command/handlers/leave-and-delete-source";
 import { ParseTgSourceParticipantsCmdHandler } from "modules/main/command/handlers/parse-tg-source-participants";
-import { TgHomunculusDS } from "modules/main/command/projections/tg-homunculus";
-import { TgSourceParticipantStatusDS } from "modules/main/command/projections/tg-participant-status";
-import { TgSourceParticipantDS } from "modules/main/command/projections/tg-source-participant";
-import { TgSourceParticipantWithStatusDS } from "modules/main/command/projections/tg-source-participant-with-status";
-import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
-import { TgUserDS } from "modules/main/command/projections/tg-user";
 import { Logger } from "winston";
 
 export const initServer = (
@@ -72,19 +66,6 @@ export const initServer = (
       const txEventBus = await eventBus.tx();
 
       // . DS
-      const homunculusDS = TgHomunculusDS({
-        knex: tx,
-      });
-      const tgSourceDS = TgSourceDS(tx);
-      const tgUserDS = TgUserDS(tx);
-      const tgSourceParticipantDS = TgSourceParticipantDS(tx);
-      const tgSourceParticipantStatusDS = TgSourceParticipantStatusDS(tx);
-      const tgSourceParticipantWithStatusDS = TgSourceParticipantWithStatusDS(
-        tx,
-        tgSourceParticipantDS,
-        tgSourceParticipantStatusDS
-      );
-
       const baseDS: BaseDS = {
         knex: tx,
         logger,
@@ -110,16 +91,16 @@ export const initServer = (
 
       const createAndSetMasterHomunculusCmdHandler = pipeAsync(
         isAuthenticatedAndNotDemoAspect,
-        CreateAndSetMasterHomunculusCmdHandler(homunculusDS, txEventBus)
+        CreateAndSetMasterHomunculusCmdHandler(baseDS, txEventBus)
       );
 
       const addPublicSourceCmdHandler = pipeAsync(
         isAuthenticatedAndNotDemoAspect,
-        AddPublicSourceCmdHandler(telegramClient, txEventBus, tgSourceDS)
+        AddPublicSourceCmdHandler(telegramClient, txEventBus, baseDS)
       );
       const addPrivateSourceCmdHandler = pipeAsync(
         isAuthenticatedAndNotDemoAspect,
-        AddPrivateSourceCmdHandler(telegramClient, txEventBus, tgSourceDS)
+        AddPrivateSourceCmdHandler(telegramClient, txEventBus, baseDS)
       );
       const parseTgSourceParticipantsCmdHandler = pipeAsync(
         isAuthenticatedAndNotDemoAspect,
@@ -127,16 +108,12 @@ export const initServer = (
           logger,
           telegramClient,
           txEventBus,
-          tgUserDS,
-          tgSourceParticipantDS,
-          tgSourceDS,
-          tgSourceParticipantStatusDS,
-          tgSourceParticipantWithStatusDS
+          baseDS
         )
       );
       const leaveAndDeleteSourceCmdHandler = pipeAsync(
         isAuthenticatedAndNotDemoAspect,
-        LeaveAndDeleteSourceCmdHandler(telegramClient, tgSourceDS)
+        LeaveAndDeleteSourceCmdHandler(telegramClient, baseDS)
       );
 
       return {

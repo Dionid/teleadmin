@@ -3,6 +3,7 @@ import { EventBus } from "fdd-ts/eda";
 import { NotFoundError } from "fdd-ts/errors";
 import { NotEmptyString } from "functional-oriented-programming-ts/branded";
 import { AuthTokenToHomunculusSetEvent } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
+import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgHomunculusDS,
   TgHomunculusPhone,
@@ -20,10 +21,13 @@ export const SetAuthTokenToHomunculusCmd =
   CommandFactory<SetAuthTokenToHomunculusCmd>("SetAuthTokenToHomunculusCmd");
 
 export const SetAuthTokenToHomunculusCmdHandler =
-  (tgHomunculusDS: TgHomunculusDS, eventBus: EventBus) =>
+  (mainModuleDS: MainModuleDS, eventBus: EventBus) =>
   async (cmd: SetAuthTokenToHomunculusCmd) => {
     // . Find Homunculus by phone
-    const homunculus = await tgHomunculusDS.getByPhone(cmd.data.phone);
+    const homunculus = await TgHomunculusDS.getByPhone(
+      mainModuleDS,
+      cmd.data.phone
+    );
 
     if (!homunculus) {
       throw new NotFoundError(
@@ -35,7 +39,7 @@ export const SetAuthTokenToHomunculusCmdHandler =
     homunculus.authToken = cmd.data.authToken;
 
     // . Update Homunculus
-    await tgHomunculusDS.update(homunculus);
+    await TgHomunculusDS.update(mainModuleDS, homunculus);
 
     // . Send Event
     const event: AuthTokenToHomunculusSetEvent = {

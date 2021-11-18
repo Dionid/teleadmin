@@ -10,6 +10,7 @@ import { joinChannel } from "libs/telegram-js/join-channel";
 import { TgSourceInviteLinkHash } from "libs/telegram-js/types";
 import { UserAlreadyInChannelError } from "modules/main/command/handlers/add-private-source/errors";
 import { PrivateSourceAddedEvent } from "modules/main/command/handlers/add-private-source/events";
+import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgSource,
   TgSourceId,
@@ -66,15 +67,15 @@ const getTgName = (channel: TypeChat | undefined): NotEmptyString | null => {
 };
 
 const sourceHandler = async (
-  tgSourceDS: TgSourceDS,
+  ds: MainModuleDS,
   sourceType: TgSourceType,
   channelResult: ChatFull,
   source: TgSource | undefined
 ): Promise<PrivateSourceAddedEvent> => {
   if (!source) {
-    return await pipeAsync(tgSourceDS.create, (source: TgSource) => {
+    return await pipeAsync(TgSourceDS.create, (source: TgSource) => {
       return PrivateSourceAddedEvent.fromTgSource(source, false);
-    })({
+    })(ds, {
       id: TgSourceId.new(),
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -85,9 +86,9 @@ const sourceHandler = async (
       deletedAt: null,
     });
   } else if (TgSource.wasDeleted(source)) {
-    return await pipeAsync(tgSourceDS.update, (source: TgSource) => {
+    return await pipeAsync(TgSourceDS.update, (source: TgSource) => {
       return PrivateSourceAddedEvent.fromTgSource(source, true);
-    })({
+    })(ds, {
       ...source,
       updatedAt: new Date(),
       tgName: getTgName(getChannel(channelResult)),
@@ -100,13 +101,14 @@ const sourceHandler = async (
 };
 
 const createSource =
-  (tgSourceDS: TgSourceDS, sourceType: TgSourceType) =>
+  (ds: MainModuleDS, sourceType: TgSourceType) =>
   async (channelResult: ChatFull): Promise<PrivateSourceAddedEvent> => {
     return sourceHandler(
-      tgSourceDS,
+      ds,
       sourceType,
       channelResult,
-      await tgSourceDS.findByTgId(
+      await TgSourceDS.findByTgId(
+        ds,
         TgSourceTgId.ofNumber(channelResult.fullChat.id)
       )
     );
@@ -126,11 +128,7 @@ const throwOnJoinChannelError = (resultOrErr: Api.TypeUpdate | Error) => {
 
 // . ATTENTION! There is 2 versions of logic, just for demo purpose
 export const AddPrivateSourceCmdHandler =
-  (
-    client: TelegramClientRef,
-    eventBus: EventBusService,
-    tgSourceDS: TgSourceDS
-  ) =>
+  (client: TelegramClientRef, eventBus: EventBusService, ds: MainModuleDS) =>
   async (cmd: AddPrivateSourceCmd) => {
     // .1. Pipe version
     await pipeAsync(
@@ -139,7 +137,7 @@ export const AddPrivateSourceCmdHandler =
       checkThatUpdates,
       getGullChannel(client.ref),
       throwOnError,
-      createSource(tgSourceDS, cmd.data.sourceType),
+      createSource(ds, cmd.data.sourceType),
       (event: Event<any, any, any>) => [
         FullEvent.fromCmdOrQuery({ event, meta: cmd.meta }),
       ],

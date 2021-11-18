@@ -1,6 +1,6 @@
 import { NotEmptyString } from "functional-oriented-programming-ts/branded";
-import { Knex } from "knex";
 import { TgUserTable } from "libs/main-db/models";
+import { BaseDS } from "libs/teleadmin/projections/ds";
 import {
   TgUser,
   TgUserId,
@@ -8,37 +8,50 @@ import {
   TgUserUsername,
 } from "modules/main/command/projections/tg-user/projection";
 
-export type TgUserDS = ReturnType<typeof TgUserDS>;
+export type TgUserDS = BaseDS;
 
-export const TgUserDS = (knex: Knex) => {
-  return {
-    findByTgId: async (tgId: TgUserTgId): Promise<TgUser | undefined> => {
-      const res = await TgUserTable(knex).where("tgId", tgId).first();
+export const findByTgId = async (
+  ds: TgUserDS,
+  tgId: TgUserTgId
+): Promise<TgUser | undefined> => {
+  const res = await TgUserTable(ds.knex).where("tgId", tgId).first();
 
-      return !res
-        ? undefined
-        : {
-            ...res,
-            id: res.id as TgUserId,
-            tgId: res.tgId as TgUserTgId,
-            tgUsername: res.tgUsername as TgUserUsername | null,
-            tgPhone: res.tgPhone as NotEmptyString | null,
-          };
-    },
+  return !res
+    ? undefined
+    : {
+        ...res,
+        id: res.id as TgUserId,
+        tgId: res.tgId as TgUserTgId,
+        tgUsername: res.tgUsername as TgUserUsername | null,
+        tgPhone: res.tgPhone as NotEmptyString | null,
+      };
+};
 
-    update: async (projection: TgUser): Promise<void> => {
-      await TgUserTable(knex).where({ id: projection.id }).update(projection);
-    },
+export const update = async (
+  ds: TgUserDS,
+  projection: TgUser
+): Promise<TgUser> => {
+  await TgUserTable(ds.knex).where({ id: projection.id }).update(projection);
 
-    create: async (
-      projection: TgUser,
-      ignoreTgId: boolean = false
-    ): Promise<void> => {
-      if (!ignoreTgId) {
-        return TgUserTable(knex).insert(projection);
-      }
+  return projection;
+};
 
-      await TgUserTable(knex).insert(projection).onConflict("tgId").ignore();
-    },
-  };
+export const create = async (
+  ds: TgUserDS,
+  projection: TgUser,
+  ignoreTgId: boolean = false
+): Promise<TgUser> => {
+  if (!ignoreTgId) {
+    await TgUserTable(ds.knex).insert(projection);
+  } else {
+    await TgUserTable(ds.knex).insert(projection).onConflict("tgId").ignore();
+  }
+
+  return projection;
+};
+
+export const TgUserDS = {
+  findByTgId,
+  update,
+  create,
 };

@@ -1,6 +1,7 @@
 import { Command, CommandFactory } from "fdd-ts/cqrs";
 import { EventBusService } from "fdd-ts/eda";
 import { Event, EventBehaviour, FullEvent } from "fdd-ts/eda/events";
+import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgHomunculus,
   TgHomunculusDS,
@@ -37,28 +38,28 @@ export type CreateAndSetMasterHomunculusCmdHandler = ReturnType<
 >;
 
 export const CreateAndSetMasterHomunculusCmdHandler =
-  (homunculusDS: TgHomunculusDS, eventBus: EventBusService) =>
+  (mainModuleDS: MainModuleDS, eventBus: EventBusService) =>
   async (cmd: CreateAndSetMasterHomunculusCmd) => {
     // . Check that there is no Homunculus with this phone
-    if (await homunculusDS.isExistByPhone(cmd.data.phone)) {
+    if (await TgHomunculusDS.isExistByPhone(mainModuleDS, cmd.data.phone)) {
       throw new Error("Homunculus with this phone already exists");
     }
 
     // . Check that there is no main Homunculus
-    if (await homunculusDS.isExistByMaster()) {
+    if (await TgHomunculusDS.isExistByMaster(mainModuleDS)) {
       throw new Error("Master Homunculus already exists");
     }
 
     // . Create new Homunculus
     const homunculus: TgHomunculus = {
-      id: TgHomunculusId.new(),
+      id: TgHomunculusId.create(),
       phone: cmd.data.phone,
       master: true,
       authToken: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    await homunculusDS.create(homunculus);
+    await TgHomunculusDS.create(mainModuleDS, homunculus);
 
     // . Send CreatedAndSettedMasterHomunculusEvent
     const event = CreatedAndSettedMasterHomunculusEvent.create({

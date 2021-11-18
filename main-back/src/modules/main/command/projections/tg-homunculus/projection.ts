@@ -10,7 +10,7 @@ export type TgHomunculusId = BrandedPrimitive<
   { readonly TgHomunculusId: unique symbol }
 >;
 export const TgHomunculusId = {
-  new: () => {
+  create: () => {
     return UUID.create() as TgHomunculusId;
   },
   ofString: (value: string) => {

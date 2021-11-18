@@ -1,10 +1,10 @@
-import { Knex } from "knex";
 import {
   TgSourceParticipantStatusTable,
   TgSourceParticipantStatusTableName,
   TgSourceParticipantTable,
   TgSourceParticipantTableName,
 } from "libs/main-db/models";
+import { BaseDS } from "libs/teleadmin/projections/ds";
 import { TgSourceId } from "modules/main/command/projections/tg-source";
 import {
   TgSourceParticipant,
@@ -22,64 +22,71 @@ export const TgSourceParticipantDM = {
     };
   },
 };
-export type TgSourceParticipantDS = ReturnType<typeof TgSourceParticipantDS>;
+export type TgSourceParticipantDS = BaseDS;
 
-export const TgSourceParticipantDS = (knex: Knex) => {
-  return {
-    getTgSourceIdAndTgUserIdNotInWithStatusJoinedRejoined: async (
-      tgSourceId: TgSourceId,
-      tgUserIds: TgUserId[]
-    ): Promise<TgSourceParticipant[]> => {
-      const result = await knex<TgSourceParticipantTable>({
-        a: TgSourceParticipantTableName,
-      })
-        .whereNotIn("tgUserId", tgUserIds)
-        .andWhere("tgSourceId", tgSourceId)
-        .andWhere(
-          knex.raw(
-            "0 < ?",
-            knex<TgSourceParticipantStatusTable>({
-              b: TgSourceParticipantStatusTableName,
-            })
-              // TODO. User const variable
-              .where(knex.raw(`"a"."id" = "b"."tg_source_participant_id"`))
-              .whereIn("type", ["Joined", "Rejoined"])
-              .groupBy("createdAt")
-              .orderBy("createdAt", "desc")
-              .limit(1)
-              .count()
-          )
-        );
+export const getTgSourceIdAndTgUserIdNotInWithStatusJoinedRejoined = async (
+  ds: TgSourceParticipantDS,
+  tgSourceId: TgSourceId,
+  tgUserIds: TgUserId[]
+): Promise<TgSourceParticipant[]> => {
+  const result = await ds
+    .knex<TgSourceParticipantTable>({
+      a: TgSourceParticipantTableName,
+    })
+    .whereNotIn("tgUserId", tgUserIds)
+    .andWhere("tgSourceId", tgSourceId)
+    .andWhere(
+      ds.knex.raw(
+        "0 < ?",
+        ds
+          .knex<TgSourceParticipantStatusTable>({
+            b: TgSourceParticipantStatusTableName,
+          })
+          // TODO. User const variable
+          .where(ds.knex.raw(`"a"."id" = "b"."tg_source_participant_id"`))
+          .whereIn("type", ["Joined", "Rejoined"])
+          .groupBy("createdAt")
+          .orderBy("createdAt", "desc")
+          .limit(1)
+          .count()
+      )
+    );
 
-      return result.map(TgSourceParticipantDM.fromTableData);
-    },
+  return result.map(TgSourceParticipantDM.fromTableData);
+};
 
-    findByTgUserIdAndTgSourceId: async (
-      tgUserId: TgUserId,
-      tgSourceId: TgSourceId
-    ): Promise<TgSourceParticipant | undefined> => {
-      const res = await TgSourceParticipantTable(knex)
-        .where({
-          tgUserId,
-          tgSourceId,
-        })
-        .first();
+export const findByTgUserIdAndTgSourceId = async (
+  ds: TgSourceParticipantDS,
+  tgUserId: TgUserId,
+  tgSourceId: TgSourceId
+): Promise<TgSourceParticipant | undefined> => {
+  const res = await TgSourceParticipantTable(ds.knex)
+    .where({
+      tgUserId,
+      tgSourceId,
+    })
+    .first();
 
-      return !res ? undefined : TgSourceParticipantDM.fromTableData(res);
-    },
+  return !res ? undefined : TgSourceParticipantDM.fromTableData(res);
+};
 
-    create: async (
-      projection: TgSourceParticipant,
-      ignoreTgId: boolean = false
-    ): Promise<void> => {
-      if (!ignoreTgId) {
-        return TgSourceParticipantTable(knex).insert(projection);
-      }
+export const create = async (
+  ds: TgSourceParticipantDS,
+  projection: TgSourceParticipant,
+  ignoreTgId: boolean = false
+): Promise<void> => {
+  if (!ignoreTgId) {
+    return TgSourceParticipantTable(ds.knex).insert(projection);
+  }
 
-      await TgSourceParticipantTable(knex)
-        .insert(projection)
-        .onConflict(["tgSourceId", "tgUserId"])
-        .ignore();
-    },
-  };
+  await TgSourceParticipantTable(ds.knex)
+    .insert(projection)
+    .onConflict(["tgSourceId", "tgUserId"])
+    .ignore();
+};
+
+export const TgSourceParticipantDS = {
+  getTgSourceIdAndTgUserIdNotInWithStatusJoinedRejoined,
+  findByTgUserIdAndTgSourceId,
+  create,
 };

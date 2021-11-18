@@ -8,7 +8,7 @@ export type TgSourceParticipantStatusId = BrandedPrimitive<
   { readonly TgSourceParticipantStatusId: unique symbol }
 >;
 export const TgSourceParticipantStatusId = {
-  new: () => {
+  create: () => {
     return UUID.create() as TgSourceParticipantStatusId;
   },
   ofString: (value: string) => {
@@ -22,31 +22,31 @@ export type TgSourceParticipantStatus = TgSourceParticipantStatusTable & {
   type: TgSourceParticipantStatusType;
 };
 export const TgSourceParticipantStatus = {
-  new: (
+  create: (
     tgSourceParticipantId: TgSourceParticipantId,
     type: TgSourceParticipantStatusType
   ) => {
     return {
-      id: TgSourceParticipantStatusId.new(),
+      id: TgSourceParticipantStatusId.create(),
       tgSourceParticipantId,
       type,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
   },
-  newJoined: (
+  createJoined: (
     tgSourceParticipantId: TgSourceParticipantId
   ): TgSourceParticipantStatus => {
-    return TgSourceParticipantStatus.new(tgSourceParticipantId, "Joined");
+    return TgSourceParticipantStatus.create(tgSourceParticipantId, "Joined");
   },
-  newRejoined: (
+  createRejoined: (
     tgSourceParticipantId: TgSourceParticipantId
   ): TgSourceParticipantStatus => {
-    return TgSourceParticipantStatus.new(tgSourceParticipantId, "Rejoined");
+    return TgSourceParticipantStatus.create(tgSourceParticipantId, "Rejoined");
   },
-  newLeft: (
+  createLeft: (
     tgSourceParticipantId: TgSourceParticipantId
   ): TgSourceParticipantStatus => {
-    return TgSourceParticipantStatus.new(tgSourceParticipantId, "Left");
+    return TgSourceParticipantStatus.create(tgSourceParticipantId, "Left");
   },
 };

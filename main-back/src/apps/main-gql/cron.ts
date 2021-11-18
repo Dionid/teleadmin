@@ -7,21 +7,19 @@ import {
   ParseTgSourceParticipantsCmd,
   ParseTgSourceParticipantsCmdHandler,
 } from "modules/main/command/handlers/parse-tg-source-participants";
-import { TgSourceParticipantStatusDS } from "modules/main/command/projections/tg-participant-status";
-import { TgSourceParticipantDS } from "modules/main/command/projections/tg-source-participant";
-import { TgSourceParticipantWithStatusDS } from "modules/main/command/projections/tg-source-participant-with-status";
+import { MainModuleDS } from "modules/main/command/projections";
 import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
-import { TgUserDS } from "modules/main/command/projections/tg-user";
 import { Logger } from "winston";
 
 export const initCronJobs = (
   knex: Knex,
   logger: Logger,
   telegramClientRef: TelegramClientRef,
-  eventBus: EventBusService
+  eventBus: EventBusService,
+  ds: MainModuleDS
 ) => {
   const parseSourcesJob = new CronJob("5 0 * * *", async () => {
-    const sources = await TgSourceDS(knex).findAllNotDeleted();
+    const sources = await TgSourceDS.findAllNotDeleted(ds);
     await Promise.all(
       sources.map(async (source) => {
         logger.debug("SOURCE PARSING FIRED");
@@ -33,22 +31,11 @@ export const initCronJobs = (
             { userId: null }
           ); // TODO. Change to server userid
         await knex.transaction(async (tx) => {
-          const tgSourceParticipantStatusDS = TgSourceParticipantStatusDS(tx);
-          const tgSourceParticipantDS = TgSourceParticipantDS(tx);
-
           await ParseTgSourceParticipantsCmdHandler(
             logger,
             telegramClientRef,
             eventBus,
-            TgUserDS(tx),
-            tgSourceParticipantDS,
-            TgSourceDS(tx),
-            tgSourceParticipantStatusDS,
-            TgSourceParticipantWithStatusDS(
-              tx,
-              tgSourceParticipantDS,
-              tgSourceParticipantStatusDS
-            )
+            ds
           )(cmd);
         });
       })

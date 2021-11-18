@@ -8,9 +8,11 @@ import {
   AddPrivateSourceCmd,
   AddPrivateSourceCmdHandler,
 } from "modules/main/command/handlers/add-private-source/index";
+import { MainModuleDS } from "modules/main/command/projections";
 import { TgSourceType } from "modules/main/command/projections/tg-source";
 import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import { Api, TelegramClient } from "telegram";
+import { mocked } from "ts-jest/utils";
 
 import Updates = Api.Updates;
 import Channel = Api.Channel;
@@ -21,9 +23,13 @@ import ChannelFull = Api.ChannelFull;
 import PeerNotifySettings = Api.PeerNotifySettings;
 import PhotoEmpty = Api.PhotoEmpty;
 import GetFullChannel = Api.channels.GetFullChannel;
+import clearAllMocks = jest.clearAllMocks;
+
+jest.mock("modules/main/command/projections/tg-source/ds");
+
+const mockedTgSourceDS = mocked(TgSourceDS);
 
 describe("AddPrivateSourceCmdHandler", () => {
-  let tgSourceDS: MockProxy<TgSourceDS>;
   let client: {
     ref: MockProxy<TelegramClient>;
   };
@@ -31,16 +37,18 @@ describe("AddPrivateSourceCmdHandler", () => {
   let cmd: AddPrivateSourceCmd;
   let sourceInviteLinkHash: TgSourceInviteLinkHash;
   let sourceType: TgSourceType;
+  let ds: MockProxy<MainModuleDS>;
 
   beforeEach(() => {
-    tgSourceDS = mock<TgSourceDS>();
     client = {
       ref: mock<TelegramClient>(),
     };
     eventBus = mock<EventBusService>();
     sourceInviteLinkHash = TgSourceInviteLinkHash.ofString("");
     sourceType = TgSourceType.fromString("Channel");
+    ds = mock<MainModuleDS>();
 
+    clearAllMocks();
     cmd = AddPrivateSourceCmd.create(
       {
         sourceInviteLinkHash,
@@ -57,7 +65,7 @@ describe("AddPrivateSourceCmdHandler", () => {
       throw new Error("USER_ALREADY_PARTICIPANT");
     });
 
-    const handler = AddPrivateSourceCmdHandler(client, eventBus, tgSourceDS);
+    const handler = AddPrivateSourceCmdHandler(client, eventBus, ds);
 
     try {
       await handler(cmd);
@@ -71,7 +79,7 @@ describe("AddPrivateSourceCmdHandler", () => {
       throw new Error("Some error");
     });
 
-    const handler = AddPrivateSourceCmdHandler(client, eventBus, tgSourceDS);
+    const handler = AddPrivateSourceCmdHandler(client, eventBus, ds);
 
     try {
       await handler(cmd);
@@ -151,7 +159,7 @@ describe("AddPrivateSourceCmdHandler", () => {
         })
       );
 
-    tgSourceDS.create.mockImplementation(async (projection) => {
+    mockedTgSourceDS.create.mockImplementation(async (ds, projection) => {
       if (
         projection.tgId !== channelId ||
         projection.tgTitle !== channelTitle
@@ -174,7 +182,7 @@ describe("AddPrivateSourceCmdHandler", () => {
       }
     });
 
-    const handler = AddPrivateSourceCmdHandler(client, eventBus, tgSourceDS);
+    const handler = AddPrivateSourceCmdHandler(client, eventBus, ds);
 
     expect(await handler(cmd)).toBeUndefined();
   });

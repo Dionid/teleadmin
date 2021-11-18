@@ -1,3 +1,4 @@
+import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgSourceParticipantStatus,
   TgSourceParticipantStatusDS,
@@ -11,22 +12,21 @@ import {
 import { TgUserId } from "modules/main/command/projections/tg-user";
 
 export const createTgParticipant = async (
+  ds: MainModuleDS,
   sourceId: TgSourceId,
-  userId: TgUserId,
-  tgSourceParticipantDS: TgSourceParticipantDS,
-  tgSourceParticipantStatusDS: TgSourceParticipantStatusDS
+  userId: TgUserId
 ) => {
   const tgSourceParticipant: TgSourceParticipant = {
-    id: TgSourceParticipantId.new(),
+    id: TgSourceParticipantId.create(),
     tgSourceId: sourceId,
     tgUserId: userId,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
-  await tgSourceParticipantDS.create(tgSourceParticipant, true);
+  await TgSourceParticipantDS.create(ds, tgSourceParticipant, true);
 
   // . If was not a user -> "Joined"
   const tgSourceParticipantStatus: TgSourceParticipantStatus =
-    TgSourceParticipantStatus.newJoined(tgSourceParticipant.id);
-  await tgSourceParticipantStatusDS.create(tgSourceParticipantStatus);
+    TgSourceParticipantStatus.createJoined(tgSourceParticipant.id);
+  await TgSourceParticipantStatusDS.create(ds, tgSourceParticipantStatus);
 };
