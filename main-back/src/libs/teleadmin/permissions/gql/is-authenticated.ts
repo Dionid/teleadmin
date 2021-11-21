@@ -1,6 +1,6 @@
+import { PermissionDeniedError } from "@fdd-node/core/errors";
+import { Maybe } from "@fop-ts/core";
 import { ResolverFn } from "apps/main-gql/infra/gql/gqlgen-types";
-import { PermissionDeniedError } from "fdd-ts/errors";
-import { Maybe } from "functional-oriented-programming-ts";
 import { UserId } from "modules/ia/command/projections/user";
 
 export const isAuthenticated =

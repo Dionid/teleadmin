@@ -1,7 +1,8 @@
-import { PublicError } from "fdd-ts/errors";
-import { NotEmptyString } from "functional-oriented-programming-ts/branded";
+import { PublicError } from "@fdd-node/core/errors";
+import { NotEmptyString } from "@fop-ts/core/branded";
+import { Context } from "libs/fdd-ts/context";
 import { TgSourceTable } from "libs/main-db/models";
-import { BaseDS } from "libs/teleadmin/projections/ds";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
 import {
   TgSource,
   TgSourceId,
@@ -21,39 +22,40 @@ const TgSourceDM = {
   },
 };
 
-export type TgSourceDS = BaseDS;
+export const findAllNotDeleted = async (): Promise<TgSource[]> => {
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
 
-export const findAllNotDeleted = async (
-  ds: TgSourceDS
-): Promise<TgSource[]> => {
-  const res = await TgSourceTable(ds.knex).where({ deletedAt: null }).select();
+  const res = await TgSourceTable(knex).where({ deletedAt: null }).select();
 
   return res.map(TgSourceDM.fromTableData);
 };
 
 export const findByName = async (
-  ds: TgSourceDS,
   name: NotEmptyString
 ): Promise<TgSource | undefined> => {
-  const res = await TgSourceTable(ds.knex).where("tgName", name).first();
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const res = await TgSourceTable(knex).where("tgName", name).first();
 
   return !res ? undefined : TgSourceDM.fromTableData(res);
 };
 
 export const findByTgId = async (
-  ds: TgSourceDS,
   tgId: TgSourceTgId
 ): Promise<TgSource | undefined> => {
-  const res = await TgSourceTable(ds.knex).where("tgId", tgId).first();
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const res = await TgSourceTable(knex).where("tgId", tgId).first();
 
   return !res ? undefined : TgSourceDM.fromTableData(res);
 };
 
 export const findByTgIdAndNotDeleted = async (
-  ds: TgSourceDS,
   tgId: TgSourceTgId
 ): Promise<TgSource | undefined> => {
-  const res = await TgSourceTable(ds.knex)
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const res = await TgSourceTable(knex)
     .where({ tgId, deletedAt: null })
     .first();
 
@@ -61,31 +63,28 @@ export const findByTgIdAndNotDeleted = async (
 };
 
 export const findByIdAndNotDeleted = async (
-  ds: TgSourceDS,
   id: TgSourceId
 ): Promise<TgSource | undefined> => {
-  const res = await TgSourceTable(ds.knex)
-    .where({ id, deletedAt: null })
-    .first();
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const res = await TgSourceTable(knex).where({ id, deletedAt: null }).first();
 
   return !res ? undefined : TgSourceDM.fromTableData(res);
 };
 
-export const update = async (
-  ds: TgSourceDS,
-  projection: TgSource
-): Promise<TgSource> => {
-  await TgSourceTable(ds.knex).where({ id: projection.id }).update(projection);
+export const update = async (projection: TgSource): Promise<TgSource> => {
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  await TgSourceTable(knex).where({ id: projection.id }).update(projection);
 
   return projection;
 };
 
-export const create = async (
-  ds: TgSourceDS,
-  projection: TgSource
-): Promise<TgSource> => {
+export const create = async (projection: TgSource): Promise<TgSource> => {
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
   try {
-    await TgSourceTable(ds.knex).insert(projection);
+    await TgSourceTable(knex).insert(projection);
 
     return projection;
   } catch (e) {
@@ -107,15 +106,12 @@ export const create = async (
   }
 };
 
-export const remove = async (
-  ds: TgSourceDS,
-  projection: TgSource
-): Promise<void> => {
+export const remove = async (projection: TgSource): Promise<void> => {
   const deletedSource: TgSource = {
     ...projection,
     deletedAt: new Date(),
   };
-  await update(ds, deletedSource);
+  await update(deletedSource);
 };
 
 export const TgSourceDS = {

@@ -3,7 +3,6 @@ import {
   tgUserIsNotParticipant,
   tgUserIsParticipant,
 } from "modules/main/command/handlers/parse-tg-source-participants/operations/tg-user-participants";
-import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgSource,
   TgSourceId,
@@ -13,44 +12,41 @@ import { TgUser, TgUserDS } from "modules/main/command/projections/tg-user";
 import { Api } from "telegram";
 
 export const tgUserExist = async (
-  ds: MainModuleDS,
   tgUser: TgUser,
   user: Api.User,
   source: TgSource
 ) => {
   // . Update its info
   const updatedTgUser: TgUser = TgUser.mergeWithTgApiUser(tgUser, user);
-  await TgUserDS.update(ds, updatedTgUser);
+  await TgUserDS.update(updatedTgUser);
 
   // . Get Status
   const tgSourceParticipantWithStatus =
     await TgSourceParticipantWithStatusDS.findByTgUserIdAndTgSourceId(
-      ds,
       tgUser.id,
       source.id
     );
 
   // . If was not a participant -> "Joined"
   if (!tgSourceParticipantWithStatus.participant) {
-    await tgUserIsNotParticipant(ds, tgUser, source);
+    await tgUserIsNotParticipant(tgUser, source);
   } else {
-    await tgUserIsParticipant(ds, tgSourceParticipantWithStatus);
+    await tgUserIsParticipant(tgSourceParticipantWithStatus);
   }
 
   return tgUser;
 };
 
 export const tgUserDoesntExist = async (
-  ds: MainModuleDS,
   user: Api.User,
   sourceId: TgSourceId
 ) => {
   // . Create TgUser
   const tgUser = TgUser.createFromTgApiUser(user);
-  await TgUserDS.create(ds, tgUser, true);
+  await TgUserDS.create(tgUser, true);
 
   // . Create TgParticipant for TgUser
-  await createTgParticipant(ds, sourceId, tgUser.id);
+  await createTgParticipant(sourceId, tgUser.id);
 
   return tgUser;
 };

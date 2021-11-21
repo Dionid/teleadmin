@@ -1,18 +1,22 @@
+import { EventBus } from "@fdd-node/core/eda";
+import { InternalError, PermissionDeniedError } from "@fdd-node/core/errors";
+import { Maybe, pipe } from "@fop-ts/core";
+import { curry } from "@fop-ts/core/function/curry";
 import { ApolloServer } from "apollo-server";
 import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import { ResolversCtx } from "apps/main-gql/infra/gql/resolver-ctx";
 import { schema } from "apps/main-gql/infra/gql/shema";
-import { EventBusService } from "fdd-ts/eda";
-import { InternalError, PermissionDeniedError } from "fdd-ts/errors";
-import { Maybe, pipeAsync } from "functional-oriented-programming-ts";
 import { GraphQLError } from "graphql";
-import { Knex } from "knex";
+import { Context } from "libs/fdd-ts/context";
 import { UserTable } from "libs/main-db/models";
+import {
+  GlobalContext,
+  GlobalContextStorage,
+} from "libs/teleadmin/contexts/global";
+import { appLogger } from "libs/teleadmin/deps/logger";
 import { JWTToken } from "libs/teleadmin/jwt-token";
 import { isAuthenticated } from "libs/teleadmin/permissions/cq/is-authenticated";
 import { IsNotDemo } from "libs/teleadmin/permissions/cq/is-not-demo";
-import { BaseDS } from "libs/teleadmin/projections/ds";
-import { TelegramClientRef } from "libs/telegram-js/client";
 import { AuthenticateCmdHandler } from "modules/ia/command/handlers/authenticate";
 import { CreateFirstAdminCmdHandler } from "modules/ia/command/handlers/create-first-admin";
 import { CreateUserCmdHandler } from "modules/ia/command/handlers/create-user";
@@ -23,25 +27,19 @@ import { CreateAndSetMainApplicationCmdHandler } from "modules/main/command/hand
 import { CreateAndSetMasterHomunculusCmdHandler } from "modules/main/command/handlers/create-and-set-main-homunculus";
 import { LeaveAndDeleteSourceCmdHandler } from "modules/main/command/handlers/leave-and-delete-source";
 import { ParseTgSourceParticipantsCmdHandler } from "modules/main/command/handlers/parse-tg-source-participants";
-import { Logger } from "winston";
 
-export const initServer = (
-  logger: Logger,
-  eventBus: EventBusService,
-  knex: Knex,
-  telegramClient: TelegramClientRef,
-  jwtSecret: string,
-  passwordHashSalt: string
-) => {
+export const initServer = (jwtSecret: string, passwordHashSalt: string) => {
+  const storage = Context.getStoreOrThrowError(GlobalContext);
+
   return new ApolloServer({
     schema,
     context: async ({
       req,
     }): Promise<ResolversCtx | { token?: string; userId?: string }> => {
       // . TX
-      logger.debug("CREATING TX");
-      const tx = await knex.transaction();
-      logger.debug("TX CREATED");
+      appLogger.debug("CREATING TX");
+      const tx = await storage.knex.transaction();
+      appLogger.debug("TX CREATED");
 
       // . AUTH_N
       const headerToken = req.headers.authorization;
@@ -63,58 +61,51 @@ export const initServer = (
       }
 
       // . EDA
-      const txEventBus = await eventBus.tx();
+      const txEventBus = await EventBus.tx(storage.eventBus);
 
-      // . DS
-      const baseDS: BaseDS = {
+      // . Global context
+      const workflowContextStorage = GlobalContextStorage.create({
+        ...storage,
         knex: tx,
-        logger,
-      };
+        eventBus: txEventBus,
+      });
 
       // . ASPECTS
-      const isAuthenticatedAndNotDemoAspect = pipeAsync(
-        isAuthenticated,
-        IsNotDemo(tx)
+      const isAuthenticatedAndNotDemoAspect = pipe(
+        curry(IsNotDemo),
+        isAuthenticated
       );
 
       // . COMMAND HANDLERS
-      const createFirstAdmin = CreateFirstAdminCmdHandler(baseDS);
-      const createUser = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        CreateUserCmdHandler(baseDS)
-      );
-      const authenticate = AuthenticateCmdHandler(jwtSecret, baseDS);
-      const createAndSetMainApplicationCmdHandler = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        CreateAndSetMainApplicationCmdHandler(baseDS)
+      const createFirstAdmin = CreateFirstAdminCmdHandler;
+
+      const createUser = pipe(isAuthenticatedAndNotDemoAspect)(
+        CreateUserCmdHandler
       );
 
-      const createAndSetMasterHomunculusCmdHandler = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        CreateAndSetMasterHomunculusCmdHandler(baseDS, txEventBus)
-      );
+      const authenticateCmdHandler = AuthenticateCmdHandler(jwtSecret);
+      const createAndSetMainApplicationCmdHandler = pipe(
+        isAuthenticatedAndNotDemoAspect
+      )(CreateAndSetMainApplicationCmdHandler);
 
-      const addPublicSourceCmdHandler = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        AddPublicSourceCmdHandler(telegramClient, txEventBus, baseDS)
+      const createAndSetMasterHomunculusCmdHandler = pipe(
+        isAuthenticatedAndNotDemoAspect
+      )(CreateAndSetMasterHomunculusCmdHandler);
+
+      const addPublicSourceCmdHandler = pipe(isAuthenticatedAndNotDemoAspect)(
+        AddPublicSourceCmdHandler
       );
-      const addPrivateSourceCmdHandler = pipeAsync(
+      const addPrivateSourceCmdHandler = pipe(
         isAuthenticatedAndNotDemoAspect,
-        AddPrivateSourceCmdHandler(telegramClient, txEventBus, baseDS)
-      );
-      const parseTgSourceParticipantsCmdHandler = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        ParseTgSourceParticipantsCmdHandler(
-          logger,
-          telegramClient,
-          txEventBus,
-          baseDS
-        )
-      );
-      const leaveAndDeleteSourceCmdHandler = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        LeaveAndDeleteSourceCmdHandler(telegramClient, baseDS)
-      );
+        Context.runC3(GlobalContext, workflowContextStorage)
+      )(AddPrivateSourceCmdHandler);
+
+      const parseTgSourceParticipantsCmdHandler = pipe(
+        isAuthenticatedAndNotDemoAspect
+      )(ParseTgSourceParticipantsCmdHandler);
+      const leaveAndDeleteSourceCmdHandler = pipe(
+        isAuthenticatedAndNotDemoAspect
+      )(LeaveAndDeleteSourceCmdHandler);
 
       return {
         tx,
@@ -136,7 +127,7 @@ export const initServer = (
             commands: {
               createFirstAdmin,
               createUser,
-              authenticate,
+              authenticate: authenticateCmdHandler,
             },
           },
         },
@@ -163,23 +154,23 @@ export const initServer = (
               }
 
               try {
-                logger.debug("COMMITTING");
+                appLogger.debug("COMMITTING");
                 await ctx.context.tx.commit();
-                logger.debug("COMMITTED");
-                await ctx.context.eventBus.commit();
+                appLogger.debug("COMMITTED");
+                await EventBus.commit(ctx.context.eventBus);
               } catch (e) {
-                logger.error(e);
+                appLogger.error(e);
                 throw e;
               }
             },
             didEncounterErrors: async (ctx) => {
               try {
-                logger.debug("ROLLING");
+                appLogger.debug("ROLLING");
                 await ctx.context.tx.rollback();
-                logger.debug("ROLLED");
-                await ctx.context.eventBus.rollback();
+                appLogger.debug("ROLLED");
+                await EventBus.rollback(ctx.context.eventBus);
               } catch (e) {
-                logger.error(e);
+                appLogger.error(e);
                 throw e;
               }
             },

@@ -1,5 +1,4 @@
 import { createTgParticipant } from "modules/main/command/handlers/parse-tg-source-participants/operations/create-tg-participant";
-import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgSourceParticipantStatus,
   TgSourceParticipantStatusDS,
@@ -9,7 +8,6 @@ import { TgSourceParticipantWithStatus } from "modules/main/command/projections/
 import { TgUser } from "modules/main/command/projections/tg-user";
 
 export const tgUserIsParticipant = async (
-  ds: MainModuleDS,
   tgSourceParticipantWithStatus: TgSourceParticipantWithStatus
 ) => {
   switch (tgSourceParticipantWithStatus.status) {
@@ -19,7 +17,6 @@ export const tgUserIsParticipant = async (
       break;
     case "Left":
       await TgSourceParticipantStatusDS.create(
-        ds,
         TgSourceParticipantStatus.createRejoined(
           tgSourceParticipantWithStatus.participant.id
         )
@@ -27,7 +24,6 @@ export const tgUserIsParticipant = async (
       break;
     case "None":
       await TgSourceParticipantStatusDS.create(
-        ds,
         TgSourceParticipantStatus.createJoined(
           tgSourceParticipantWithStatus.participant.id
         )
@@ -37,10 +33,8 @@ export const tgUserIsParticipant = async (
 };
 
 export const tgUserIsNotParticipant = async (
-  ds: MainModuleDS,
-
   tgUser: TgUser,
   source: TgSource
 ) => {
-  await createTgParticipant(ds, source.id, tgUser.id);
+  await createTgParticipant(source.id, tgUser.id);
 };

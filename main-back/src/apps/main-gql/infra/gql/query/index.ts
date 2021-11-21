@@ -1,9 +1,9 @@
+import { mapCommonSearchParamsToQuery } from "@fdd-node/core/apollo-knex";
+import { mapCountToNumber } from "@fdd-node/core/knex-utils";
+import { Array } from "@fop-ts/core";
 import { QueryResolvers } from "apps/main-gql/infra/gql/gqlgen-types";
 import { mapTgSource, mapTgUser } from "apps/main-gql/infra/gql/mappers";
 import { ResolversCtx } from "apps/main-gql/infra/gql/resolver-ctx";
-import { mapCommonSearchParamsToQuery } from "fdd-ts/apollo-knex";
-import { mapCountToNumber } from "fdd-ts/knex-utils";
-import { mapArray } from "functional-oriented-programming-ts";
 import { getQueryFields } from "libs/apollo/query-fields";
 import {
   TgSourceParticipantStatusTable,
@@ -60,7 +60,7 @@ export const Query: QueryResolvers<ResolversCtx> = {
     return res ? mapTgSource(res) : null;
   }),
   tgUser: isAuthenticated(async (parent, args, context) => {
-    return mapArray(mapTgUser)(
+    return Array.map(mapTgUser)(
       await mapCommonSearchParamsToQuery(args)(TgUserTable(context.tx))
     );
   }),
@@ -88,7 +88,7 @@ export const Query: QueryResolvers<ResolversCtx> = {
       aggregate: {
         count,
       },
-      nodes: mapArray(mapTgUser)(nodes),
+      nodes: nodes.map(mapTgUser),
     };
   }),
   tgUserByPk: isAuthenticated(async (parent, args, context, info) => {

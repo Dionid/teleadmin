@@ -1,28 +1,22 @@
+import { EventBus, FullEvent } from "@fdd-node/core/eda";
 import { CronSourcesParsingCompletedEvent } from "apps/main-gql/subs";
 import { CronJob } from "cron";
-import { EventBusService, FullEvent } from "fdd-ts/eda";
-import { Knex } from "knex";
-import { TelegramClientRef } from "libs/telegram-js/client";
+import { Context } from "libs/fdd-ts/context";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
+import { appLogger } from "libs/teleadmin/deps/logger";
 import {
   ParseTgSourceParticipantsCmd,
   ParseTgSourceParticipantsCmdHandler,
 } from "modules/main/command/handlers/parse-tg-source-participants";
-import { MainModuleDS } from "modules/main/command/projections";
 import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
-import { Logger } from "winston";
 
-export const initCronJobs = (
-  knex: Knex,
-  logger: Logger,
-  telegramClientRef: TelegramClientRef,
-  eventBus: EventBusService,
-  ds: MainModuleDS
-) => {
+export const initCronJobs = () => {
+  const storage = Context.getStoreOrThrowError(GlobalContext);
   const parseSourcesJob = new CronJob("5 0 * * *", async () => {
-    const sources = await TgSourceDS.findAllNotDeleted(ds);
+    const sources = await TgSourceDS.findAllNotDeleted();
     await Promise.all(
       sources.map(async (source) => {
-        logger.debug("SOURCE PARSING FIRED");
+        appLogger.debug("SOURCE PARSING FIRED");
         const cmd: ParseTgSourceParticipantsCmd =
           ParseTgSourceParticipantsCmd.create(
             {
@@ -30,25 +24,29 @@ export const initCronJobs = (
             },
             { userId: null }
           ); // TODO. Change to server userid
-        await knex.transaction(async (tx) => {
-          await ParseTgSourceParticipantsCmdHandler(
-            logger,
-            telegramClientRef,
-            eventBus,
-            ds
-          )(cmd);
+        await storage.knex.transaction(async (tx) => {
+          await Context.run(
+            GlobalContext,
+            {
+              ...storage,
+              knex: tx,
+            },
+            async () => {
+              await ParseTgSourceParticipantsCmdHandler(cmd);
+            }
+          );
         });
       })
     );
-    await eventBus.publish([
-      FullEvent.fromEvent({
+    await EventBus.publish(storage.eventBus, [
+      FullEvent.ofEvent({
         event: CronSourcesParsingCompletedEvent.create({}),
         userId: null, // TODO. Change to server userid
       }),
     ]);
   });
 
-  logger.info(`Cron jobs setted up`);
+  appLogger.info(`Cron jobs setted up`);
 
   return {
     parseSourcesJob,

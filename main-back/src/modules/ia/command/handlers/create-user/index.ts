@@ -1,6 +1,5 @@
-import { Command, CommandFactory } from "fdd-ts/cqrs";
-import { PublicError } from "fdd-ts/errors";
-import { IAModuleDS } from "modules/ia/command/projections";
+import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
+import { PublicError } from "@fdd-node/core/errors";
 import {
   UserDS,
   User,
@@ -15,21 +14,20 @@ export type CreateUserCmd = Command<
     password: UserHashedPassword;
   }
 >;
-export const CreateUserCmd = CommandFactory("CreateUserCmd");
+export const CreateUserCmd = CommandBehaviorFactory("CreateUserCmd");
 
-export type CreateUserCmdHandler = ReturnType<typeof CreateUserCmdHandler>;
+export type CreateUserCmdHandler = typeof CreateUserCmdHandler;
 
-export const CreateUserCmdHandler =
-  (commonDS: IAModuleDS) => async (cmd: CreateUserCmd) => {
-    const newUser = User.newUnactivatedUser(cmd.data.email, cmd.data.password);
+export const CreateUserCmdHandler = async (cmd: CreateUserCmd) => {
+  const newUser = User.newUnactivatedUser(cmd.data.email, cmd.data.password);
 
-    try {
-      await UserDS.create(commonDS, newUser);
-    } catch (e) {
-      if (e instanceof Error && e.message.includes("user_email_key")) {
-        throw new PublicError("User with this email already exists");
-      }
-
-      throw e;
+  try {
+    await UserDS.create(newUser);
+  } catch (e) {
+    if (e instanceof Error && e.message.includes("user_email_key")) {
+      throw new PublicError("User with this email already exists");
     }
-  };
+
+    throw e;
+  }
+};

@@ -1,4 +1,4 @@
-import { Event, EventBehaviour } from "fdd-ts/eda/events";
+import { Event, EventBehaviourFactory } from "@fdd-node/core/eda";
 import {
   TgSource,
   TgSourceId,
@@ -17,7 +17,10 @@ export type PrivateSourceAddedEvent = Event<
 >;
 
 export const PrivateSourceAddedEvent = {
-  ...EventBehaviour.create<PrivateSourceAddedEvent>("PrivateSourceAdded", "v1"),
+  ...EventBehaviourFactory.create<PrivateSourceAddedEvent>(
+    "PrivateSourceAdded",
+    "v1"
+  ),
   fromTgSource: (tgSource: TgSource, wasDeleted: boolean) => {
     return PrivateSourceAddedEvent.create({
       id: tgSource.id,

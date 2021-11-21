@@ -1,6 +1,10 @@
+import { EventBus } from "@fdd-node/core/eda";
+import { UUID } from "@fdd-node/core/fop-utils";
 import { BigInteger } from "big-integer";
-import { EventBusService } from "fdd-ts/eda";
 import { mock, MockProxy } from "jest-mock-extended";
+import { Knex } from "knex";
+import { Context } from "libs/fdd-ts/context";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
 import { checkIfMeIsChannelAdmin } from "libs/telegram-js/check-if-me-is-channel-admin";
 import { getAllChannelParticipants } from "libs/telegram-js/get-channel-partisipants";
 import {
@@ -12,7 +16,6 @@ import {
   tgUserDoesntExist,
   tgUserExist,
 } from "modules/main/command/handlers/parse-tg-source-participants/operations/user-presence";
-import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgSource,
   TgSourceId,
@@ -25,7 +28,7 @@ import {
   TgUserId,
   TgUserTgId,
 } from "modules/main/command/projections/tg-user";
-import { Api, TelegramClient } from "telegram";
+import { Api } from "telegram";
 import { mocked } from "ts-jest/utils";
 import { Logger } from "winston";
 
@@ -38,6 +41,7 @@ import clearAllMocks = jest.clearAllMocks;
 
 jest.mock("libs/telegram-js/check-if-me-is-channel-admin");
 jest.mock("libs/telegram-js/get-channel-partisipants");
+jest.mock("@fdd-node/core/eda/event-bus");
 jest.mock(
   "modules/main/command/handlers/parse-tg-source-participants/operations/user-presence"
 );
@@ -56,21 +60,15 @@ const mockedTgSourceDS = mocked(TgSourceDS);
 const mockedTgUserDS = mocked(TgUserDS);
 
 describe("ParseTgSourceParticipantsCmdHandler", () => {
-  let logger: MockProxy<Logger>;
-  let client: {
-    ref: MockProxy<TelegramClient>;
-  };
-  let eventBus: MockProxy<EventBusService>;
+  let eventBus: MockProxy<EventBus>;
   let cmd: ParseTgSourceParticipantsCmd;
-  let ds: MockProxy<MainModuleDS>;
+  let knex: MockProxy<Knex>;
+  let logger: MockProxy<Logger>;
 
   beforeEach(() => {
+    eventBus = mock<EventBus>();
     logger = mock<Logger>();
-    client = {
-      ref: mock<TelegramClient>(),
-    };
-    eventBus = mock<EventBusService>();
-    ds = mock<MainModuleDS>();
+    knex = mock<Knex>();
     cmd = ParseTgSourceParticipantsCmd.create(
       {
         sourceId: TgSourceId.new(),
@@ -148,14 +146,19 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
         })
       );
 
-      const handler = ParseTgSourceParticipantsCmdHandler(
-        logger,
-        client,
-        eventBus,
-        ds
-      );
-
-      expect(await handler(cmd)).toBeUndefined();
+      expect(
+        await Context.run(
+          GlobalContext,
+          {
+            knex,
+            eventBus,
+            logger,
+            txId: UUID.create(),
+          },
+          ParseTgSourceParticipantsCmdHandler,
+          cmd
+        )
+      ).toBeUndefined();
       expect(mockedMarkLeftParticipants).toHaveBeenCalledTimes(1);
       expect(mockedCheckIfMeIsChannelAdmin).toHaveBeenCalledTimes(1);
       expect(mockedTgUserDoesntExist).toHaveBeenCalledTimes(
@@ -244,7 +247,7 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
         })
       );
 
-      mockedTgUserDS.findByTgId.mockImplementation(async (ds, tgId) => {
+      mockedTgUserDS.findByTgId.mockImplementation(async (tgId) => {
         if (tgId === TgUserTgId.ofString(123)) {
           return tgUser;
         }
@@ -252,14 +255,19 @@ describe("ParseTgSourceParticipantsCmdHandler", () => {
         return undefined;
       });
 
-      const handler = ParseTgSourceParticipantsCmdHandler(
-        logger,
-        client,
-        eventBus,
-        ds
-      );
-
-      expect(await handler(cmd)).toBeUndefined();
+      expect(
+        await Context.run(
+          GlobalContext,
+          {
+            knex,
+            eventBus,
+            logger,
+            txId: UUID.create(),
+          },
+          ParseTgSourceParticipantsCmdHandler,
+          cmd
+        )
+      ).toBeUndefined();
       expect(mockedMarkLeftParticipants).toHaveBeenCalledTimes(1);
       expect(mockedCheckIfMeIsChannelAdmin).toHaveBeenCalledTimes(1);
       expect(mockedTgUserExist).toHaveBeenCalledTimes(1);

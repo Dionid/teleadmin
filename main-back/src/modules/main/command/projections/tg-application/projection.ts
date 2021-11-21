@@ -1,8 +1,5 @@
-import { UUID } from "fdd-ts/fop-utils";
-import {
-  BrandedPrimitive,
-  NotEmptyString,
-} from "functional-oriented-programming-ts/branded";
+import { UUID } from "@fdd-node/core/fop-utils";
+import { BrandedPrimitive, NotEmptyString } from "@fop-ts/core/branded";
 import { TgApplicationTable } from "libs/main-db/models";
 
 export type TgApplicationId = BrandedPrimitive<
@@ -17,6 +14,7 @@ export const TgApplicationId = {
     return UUID.ofString(value) as TgApplicationId;
   },
 };
+
 export type TgApplication = TgApplicationTable & {
   id: TgApplicationId;
   name: NotEmptyString;

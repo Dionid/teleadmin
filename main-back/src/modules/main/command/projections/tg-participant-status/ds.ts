@@ -1,5 +1,6 @@
+import { Context } from "libs/fdd-ts/context";
 import { TgSourceParticipantStatusTable } from "libs/main-db/models";
-import { BaseDS } from "libs/teleadmin/projections/ds";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
 import {
   TgSourceParticipantStatus,
   TgSourceParticipantStatusId,
@@ -7,13 +8,12 @@ import {
 } from "modules/main/command/projections/tg-participant-status/projection";
 import { TgSourceParticipantId } from "modules/main/command/projections/tg-source-participant";
 
-export type TgSourceParticipantStatusDS = BaseDS;
-
 export const findLatestStatusByTgSourceParticipantId = async (
-  ds: TgSourceParticipantStatusDS,
   tgSourceParticipantId: TgSourceParticipantId
 ): Promise<TgSourceParticipantStatus | undefined> => {
-  const res = await TgSourceParticipantStatusTable(ds.knex)
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const res = await TgSourceParticipantStatusTable(knex)
     .where({
       tgSourceParticipantId,
     })
@@ -32,10 +32,11 @@ export const findLatestStatusByTgSourceParticipantId = async (
 };
 
 export const create = async (
-  ds: TgSourceParticipantStatusDS,
   projection: TgSourceParticipantStatus
 ): Promise<void> => {
-  return TgSourceParticipantStatusTable(ds.knex).insert(projection);
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  return TgSourceParticipantStatusTable(knex).insert(projection);
 };
 
 export const TgSourceParticipantStatusDS = {

@@ -1,5 +1,4 @@
-import { Command, CommandFactory } from "fdd-ts/cqrs";
-import { IAModuleDS } from "modules/ia/command/projections";
+import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
 import {
   UserDS,
   User,
@@ -14,22 +13,19 @@ export type CreateFirstAdminCmd = Command<
     password: UserHashedPassword;
   }
 >;
-export const CreateFirstAdminCmd = CommandFactory<CreateFirstAdminCmd>(
+export const CreateFirstAdminCmd = CommandBehaviorFactory<CreateFirstAdminCmd>(
   "CreateFirstAdminCmd"
 );
 
-export type CreateFirstAdminCmdHandler = ReturnType<
-  typeof CreateFirstAdminCmdHandler
->;
+export type CreateFirstAdminCmdHandler = typeof CreateFirstAdminCmdHandler;
 
-export const CreateFirstAdminCmdHandler =
-  (commonDS: IAModuleDS) => async (cmd: CreateFirstAdminCmd) => {
-    const user = await UserDS.findAny(commonDS);
+export const CreateFirstAdminCmdHandler = async (cmd: CreateFirstAdminCmd) => {
+  const user = await UserDS.findAny();
 
-    if (user) {
-      throw new Error("Admin is already exist");
-    }
+  if (user) {
+    throw new Error("Admin is already exist");
+  }
 
-    const newUser = User.newUnactivatedUser(cmd.data.email, cmd.data.password);
-    await UserDS.create(commonDS, newUser);
-  };
+  const newUser = User.newUnactivatedUser(cmd.data.email, cmd.data.password);
+  await UserDS.create(newUser);
+};

@@ -1,11 +1,12 @@
-import { Command, CommandFactory } from "fdd-ts/cqrs";
-import { EventBusService } from "fdd-ts/eda";
-import { FullEvent } from "fdd-ts/eda/events";
-import { PublicError, returnOnThrow } from "fdd-ts/errors";
-import { NotEmptyString } from "functional-oriented-programming-ts/branded";
-import { TelegramClientRef } from "libs/telegram-js/client";
+import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
+import { EventBus } from "@fdd-node/core/eda";
+import { FullEvent } from "@fdd-node/core/eda/full-event";
+import { PublicError, returnOnThrow } from "@fdd-node/core/errors";
+import { NotEmptyString } from "@fop-ts/core/branded";
+import { telegramClient } from "apps/main-gql/set-tg-client";
+import { Context } from "libs/fdd-ts/context";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
 import { PublicSourceAddedEvent } from "modules/main/command/handlers/add-public-source/events";
-import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgSource,
   TgSourceId,
@@ -26,7 +27,7 @@ export type AddPublicSourceCmd = Command<
   }
 >;
 export const AddPublicSourceCmd =
-  CommandFactory<AddPublicSourceCmd>("AddPublicSourceCmd");
+  CommandBehaviorFactory<AddPublicSourceCmd>("AddPublicSourceCmd");
 
 export type AddPublicSourceCmdHandler = ReturnType<
   typeof AddPublicSourceCmdHandler
@@ -44,17 +45,13 @@ const getChannelTitle = (channelResultOrErr: ChatFull): string => {
   return "";
 };
 
-const sourceWasDeleted = async (
-  client: TelegramClientRef,
-  eventBus: EventBusService,
-  ds: MainModuleDS,
-  cmd: AddPublicSourceCmd,
-  source: TgSource
-) => {
+const sourceWasDeleted = async (cmd: AddPublicSourceCmd, source: TgSource) => {
+  const { eventBus } = Context.getStoreOrThrowError(GlobalContext);
+
   // TODO. If it was already deleted than we still can be in channel
   // . Join channel
   const resultOrErr = await returnOnThrow(() =>
-    client.ref.invoke(
+    telegramClient.invoke(
       new Api.channels.JoinChannel({
         channel: cmd.data.sourceName,
       })
@@ -67,7 +64,7 @@ const sourceWasDeleted = async (
 
   // . Get channel info
   const channelResultOrErr = await returnOnThrow(() =>
-    client.ref.invoke(
+    telegramClient.invoke(
       new Api.channels.GetFullChannel({
         channel: cmd.data.sourceName,
       })
@@ -87,7 +84,7 @@ const sourceWasDeleted = async (
     tgTitle: getChannelTitle(channelResultOrErr),
     deletedAt: null,
   };
-  await TgSourceDS.update(ds, updatedDeletedSource);
+  await TgSourceDS.update(updatedDeletedSource);
 
   // . Success
   const event = PublicSourceAddedEvent.create({
@@ -96,23 +93,20 @@ const sourceWasDeleted = async (
     tgName: updatedDeletedSource.tgName,
     wasDeleted: true,
   });
-  eventBus.publish([
-    FullEvent.fromCmdOrQuery({
+  EventBus.publish(eventBus, [
+    FullEvent.ofCmdOrQuery({
       event,
       meta: cmd.meta,
     }),
   ]);
 };
 
-const sourceIsNew = async (
-  client: TelegramClientRef,
-  ds: MainModuleDS,
-  eventBus: EventBusService,
-  cmd: AddPublicSourceCmd
-) => {
+const sourceIsNew = async (cmd: AddPublicSourceCmd) => {
+  const { eventBus } = Context.getStoreOrThrowError(GlobalContext);
+
   // . Join channel
   const resultOrErr = await returnOnThrow(() =>
-    client.ref.invoke(
+    telegramClient.invoke(
       new Api.channels.JoinChannel({
         channel: cmd.data.sourceName,
       })
@@ -125,7 +119,7 @@ const sourceIsNew = async (
 
   // . Get channel info
   const channelResultOrErr = await returnOnThrow(() =>
-    client.ref.invoke(
+    telegramClient.invoke(
       new Api.channels.GetFullChannel({
         channel: cmd.data.sourceName,
       })
@@ -150,7 +144,7 @@ const sourceIsNew = async (
     tgTitle: getChannelTitle(channelResultOrErr),
     deletedAt: null,
   };
-  await TgSourceDS.create(ds, newSource);
+  await TgSourceDS.create(newSource);
 
   // . Success
   const event = PublicSourceAddedEvent.create({
@@ -159,27 +153,25 @@ const sourceIsNew = async (
     tgName: newSource.tgName,
     wasDeleted: false,
   });
-  eventBus.publish([
-    FullEvent.fromCmdOrQuery({
+  EventBus.publish(eventBus, [
+    FullEvent.ofCmdOrQuery({
       event,
       meta: cmd.meta,
     }),
   ]);
 };
 
-export const AddPublicSourceCmdHandler =
-  (client: TelegramClientRef, eventBus: EventBusService, ds: MainModuleDS) =>
-  async (cmd: AddPublicSourceCmd) => {
-    // . Check if source like that doesn't exist
-    const source = await TgSourceDS.findByName(ds, cmd.data.sourceName);
+export const AddPublicSourceCmdHandler = async (cmd: AddPublicSourceCmd) => {
+  // . Check if source like that doesn't exist
+  const source = await TgSourceDS.findByName(cmd.data.sourceName);
 
-    if (!source) {
-      await sourceIsNew(client, ds, eventBus, cmd);
-    } else if (TgSource.wasDeleted(source)) {
-      await sourceWasDeleted(client, eventBus, ds, cmd, source);
-    } else {
-      throw new PublicError(
-        `you already have source with tg name ${cmd.data.sourceName}`
-      );
-    }
-  };
+  if (!source) {
+    await sourceIsNew(cmd);
+  } else if (TgSource.wasDeleted(source)) {
+    await sourceWasDeleted(cmd, source);
+  } else {
+    throw new PublicError(
+      `you already have source with tg name ${cmd.data.sourceName}`
+    );
+  }
+};

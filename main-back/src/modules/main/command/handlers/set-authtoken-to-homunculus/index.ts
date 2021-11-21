@@ -1,9 +1,10 @@
-import { Command, CommandFactory } from "fdd-ts/cqrs";
-import { EventBus } from "fdd-ts/eda";
-import { NotFoundError } from "fdd-ts/errors";
-import { NotEmptyString } from "functional-oriented-programming-ts/branded";
+import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
+import { EventBus } from "@fdd-node/core/eda";
+import { NotFoundError } from "@fdd-node/core/errors";
+import { NotEmptyString } from "@fop-ts/core/branded";
+import { Context } from "libs/fdd-ts/context";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
 import { AuthTokenToHomunculusSetEvent } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
-import { MainModuleDS } from "modules/main/command/projections";
 import {
   TgHomunculusDS,
   TgHomunculusPhone,
@@ -18,47 +19,44 @@ export type SetAuthTokenToHomunculusCmd = Command<
   }
 >;
 export const SetAuthTokenToHomunculusCmd =
-  CommandFactory<SetAuthTokenToHomunculusCmd>("SetAuthTokenToHomunculusCmd");
+  CommandBehaviorFactory<SetAuthTokenToHomunculusCmd>(
+    "SetAuthTokenToHomunculusCmd"
+  );
 
-export const SetAuthTokenToHomunculusCmdHandler =
-  (mainModuleDS: MainModuleDS, eventBus: EventBus) =>
-  async (cmd: SetAuthTokenToHomunculusCmd) => {
-    // . Find Homunculus by phone
-    const homunculus = await TgHomunculusDS.getByPhone(
-      mainModuleDS,
-      cmd.data.phone
+export const SetAuthTokenToHomunculusCmdHandler = async (
+  cmd: SetAuthTokenToHomunculusCmd
+) => {
+  const { eventBus } = Context.getStoreOrThrowError(GlobalContext);
+  // . Find Homunculus by phone
+  const homunculus = await TgHomunculusDS.getByPhone(cmd.data.phone);
+
+  if (!homunculus) {
+    throw new NotFoundError(
+      `Homunculus by phone ${cmd.data.phone} does not exist`
     );
+  }
 
-    if (!homunculus) {
-      throw new NotFoundError(
-        `Homunculus by phone ${cmd.data.phone} does not exist`
-      );
-    }
+  // . Set authToken
+  homunculus.authToken = cmd.data.authToken;
 
-    // . Set authToken
-    homunculus.authToken = cmd.data.authToken;
+  // . Update Homunculus
+  await TgHomunculusDS.update(homunculus);
 
-    // . Update Homunculus
-    await TgHomunculusDS.update(mainModuleDS, homunculus);
+  // . Send Event
+  const event: AuthTokenToHomunculusSetEvent =
+    AuthTokenToHomunculusSetEvent.create({
+      authToken: homunculus.authToken,
+    });
 
-    // . Send Event
-    const event: AuthTokenToHomunculusSetEvent = {
-      type: "AuthTokenToHomunculusSetEvent",
-      version: "v1",
-      data: {
-        authToken: homunculus.authToken,
+  EventBus.publish(eventBus, [
+    {
+      ...event,
+      meta: {
+        id: v4(),
+        createdAt: new Date(),
+        userId: cmd.meta.userId,
+        rootTransactionId: cmd.meta.transactionId,
       },
-    };
-
-    EventBus.publish(eventBus, [
-      {
-        ...event,
-        meta: {
-          id: v4(),
-          createdAt: new Date(),
-          userId: cmd.meta.userId,
-          rootTransactionId: cmd.meta.transactionId,
-        },
-      },
-    ]);
-  };
+    },
+  ]);
+};

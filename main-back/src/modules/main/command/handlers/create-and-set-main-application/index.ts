@@ -1,6 +1,5 @@
-import { Command, CommandFactory } from "fdd-ts/cqrs";
-import { NotEmptyString } from "functional-oriented-programming-ts/branded";
-import { MainModuleDS } from "modules/main/command/projections";
+import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
+import { NotEmptyString } from "@fop-ts/core/branded";
 import { TgApplicationDS } from "modules/main/command/projections/tg-application/ds";
 import {
   TgApplication,
@@ -16,7 +15,7 @@ export type CreateAndSetMainApplicationCmd = Command<
   }
 >;
 export const CreateAndSetMainApplicationCmd =
-  CommandFactory<CreateAndSetMainApplicationCmd>(
+  CommandBehaviorFactory<CreateAndSetMainApplicationCmd>(
     "CreateAndSetMainApplicationCmd"
   );
 
@@ -24,34 +23,34 @@ export type CreateAndSetMainApplicationCmdHandler = ReturnType<
   typeof CreateAndSetMainApplicationCmdHandler
 >;
 
-export const CreateAndSetMainApplicationCmdHandler =
-  (mainModuleDS: MainModuleDS) =>
-  async (cmd: CreateAndSetMainApplicationCmd) => {
-    // . Check that there is no app with this appId
-    if (await TgApplicationDS.isExistByAppId(mainModuleDS, cmd.data.appId)) {
-      throw new Error(`There is already app with app id ${cmd.data.appId}`);
-    }
+export const CreateAndSetMainApplicationCmdHandler = async (
+  cmd: CreateAndSetMainApplicationCmd
+) => {
+  // . Check that there is no app with this appId
+  if (await TgApplicationDS.isExistByAppId(cmd.data.appId)) {
+    throw new Error(`There is already app with app id ${cmd.data.appId}`);
+  }
 
-    // . Check that there is no main app
-    if (await TgApplicationDS.isMainAppExist(mainModuleDS)) {
-      throw new Error("Main app already exist");
-    }
+  // . Check that there is no main app
+  if (await TgApplicationDS.isMainAppExist()) {
+    throw new Error("Main app already exist");
+  }
 
-    // ? Check that app in tg is exists
-    // ...
+  // ? Check that app in tg is exists
+  // ...
 
-    // . Create new Application
-    const app: TgApplication = {
-      id: TgApplicationId.create(),
-      name: cmd.data.name,
-      appId: cmd.data.appId,
-      appHash: cmd.data.appHash,
-      main: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-    await TgApplicationDS.create(mainModuleDS, app);
-
-    // . Send TgApplicationCreatedAndSettedAsMainEvent
-    // ...
+  // . Create new Application
+  const app: TgApplication = {
+    id: TgApplicationId.create(),
+    name: cmd.data.name,
+    appId: cmd.data.appId,
+    appHash: cmd.data.appHash,
+    main: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
+  await TgApplicationDS.create(app);
+
+  // . Send TgApplicationCreatedAndSettedAsMainEvent
+  // ...
+};

@@ -1,4 +1,4 @@
-import { FullEvent } from "fdd-ts/eda";
+import { FullEvent } from "@fdd-node/core/eda";
 import { Knex } from "knex";
 import { EventModel } from "libs/main-db/models/event";
 
@@ -19,7 +19,7 @@ export const saveEvent = async <E extends FullEvent>(
   await EventModel(persistor.knex).insert({
     id: event.meta.id,
     createdAt: new Date(),
-    type: event.type,
+    type: event.name(),
     data: event.data,
     version: event.version,
     userId: event.meta.userId,

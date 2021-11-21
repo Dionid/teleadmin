@@ -1,8 +1,8 @@
 import crypto from "crypto";
 
-import { ValidationError } from "fdd-ts/errors";
-import { UUID } from "fdd-ts/fop-utils";
-import { BrandedPrimitive } from "functional-oriented-programming-ts/branded";
+import { ValidationError } from "@fdd-node/core/errors";
+import { UUID } from "@fdd-node/core/fop-utils";
+import { BrandedPrimitive } from "@fop-ts/core/branded";
 import { UserTable } from "libs/main-db/models";
 
 export type UserId = BrandedPrimitive<UUID, { readonly UserId: unique symbol }>;
@@ -49,11 +49,13 @@ export const UserHashedPassword = {
     return currentPassword === comparePassword;
   },
 };
+
 export type User = UserTable & {
   id: UserId;
   email: UserEmail;
   password: UserHashedPassword;
 };
+
 export const User = {
   newUnactivatedUser: (
     email: UserEmail,

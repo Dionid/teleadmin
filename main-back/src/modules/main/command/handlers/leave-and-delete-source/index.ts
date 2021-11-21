@@ -1,7 +1,6 @@
-import { Command, CommandFactory } from "fdd-ts/cqrs";
-import { NotFoundError } from "fdd-ts/errors";
-import { TelegramClientRef } from "libs/telegram-js/client";
-import { MainModuleDS } from "modules/main/command/projections";
+import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
+import { NotFoundError } from "@fdd-node/core/errors";
+import { telegramClient } from "apps/main-gql/set-tg-client";
 import { TgSourceId } from "modules/main/command/projections/tg-source";
 import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import { Api } from "telegram";
@@ -14,32 +13,28 @@ export type LeaveAndDeleteSourceCmd = Command<
     sourceId: TgSourceId;
   }
 >;
-export const LeaveAndDeleteSourceCmd = CommandFactory<LeaveAndDeleteSourceCmd>(
-  "LeaveAndDeleteSourceCmd"
-);
+export const LeaveAndDeleteSourceCmd =
+  CommandBehaviorFactory<LeaveAndDeleteSourceCmd>("LeaveAndDeleteSourceCmd");
 
-export const LeaveAndDeleteSourceCmdHandler =
-  (client: TelegramClientRef, ds: MainModuleDS) =>
-  async (cmd: LeaveAndDeleteSourceCmd) => {
-    // . Get source
-    const source = await TgSourceDS.findByIdAndNotDeleted(
-      ds,
-      cmd.data.sourceId
-    );
+export const LeaveAndDeleteSourceCmdHandler = async (
+  cmd: LeaveAndDeleteSourceCmd
+) => {
+  // . Get source
+  const source = await TgSourceDS.findByIdAndNotDeleted(cmd.data.sourceId);
 
-    if (!source) {
-      throw new NotFoundError(`Source not found`);
-    }
+  if (!source) {
+    throw new NotFoundError(`Source not found`);
+  }
 
-    // . Leave source
-    await client.ref.invoke(
-      new Api.channels.LeaveChannel({
-        channel: new PeerChannel({
-          channelId: source.tgId,
-        }),
-      })
-    );
+  // . Leave source
+  await telegramClient.invoke(
+    new Api.channels.LeaveChannel({
+      channel: new PeerChannel({
+        channelId: source.tgId,
+      }),
+    })
+  );
 
-    // . Delete source
-    await TgSourceDS.remove(ds, source);
-  };
+  // . Delete source
+  await TgSourceDS.remove(source);
+};
