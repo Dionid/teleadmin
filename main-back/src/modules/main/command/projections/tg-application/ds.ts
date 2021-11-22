@@ -1,16 +1,16 @@
-import { countMoreThanZero } from "fdd-ts/knex-utils";
-import { NotEmptyString } from "functional-oriented-programming-ts/branded";
+import { countMoreThanZero } from "@fdd-node/core/knex-utils";
+import { NotEmptyString } from "@fop-ts/core/branded";
+import { Context } from "libs/fdd-ts/context";
 import { TgApplicationTable } from "libs/main-db/models";
-import { BaseDS } from "libs/teleadmin/projections/ds";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
 import { TgApplication } from "modules/main/command/projections/tg-application/projection";
 
-export type TgApplicationDS = BaseDS;
-
 export const isExistByAppId = async (
-  ds: TgApplicationDS,
   appId: NotEmptyString
 ): Promise<boolean> => {
-  const res = await TgApplicationTable(ds.knex)
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const res = await TgApplicationTable(knex)
     .where({
       appId,
     })
@@ -20,8 +20,10 @@ export const isExistByAppId = async (
   return countMoreThanZero(count);
 };
 
-export const isMainAppExist = async (ds: TgApplicationDS): Promise<boolean> => {
-  const res = await TgApplicationTable(ds.knex)
+export const isMainAppExist = async (): Promise<boolean> => {
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const res = await TgApplicationTable(knex)
     .where({
       main: true,
     })
@@ -33,10 +35,11 @@ export const isMainAppExist = async (ds: TgApplicationDS): Promise<boolean> => {
 
 // . COMMAND
 export const create = async (
-  ds: TgApplicationDS,
   projection: TgApplication
 ): Promise<TgApplication> => {
-  await TgApplicationTable(ds.knex).insert(projection);
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  await TgApplicationTable(knex).insert(projection);
 
   return projection;
 };

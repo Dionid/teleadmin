@@ -1,6 +1,7 @@
-import { NotEmptyString } from "functional-oriented-programming-ts/branded";
+import { NotEmptyString } from "@fop-ts/core/branded";
+import { Context } from "libs/fdd-ts/context";
 import { TgHomunculusTable } from "libs/main-db/models";
-import { BaseDS } from "libs/teleadmin/projections/ds";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
 import {
   TgHomunculus,
   TgHomunculusId,
@@ -17,13 +18,13 @@ const TgHomunculusDM = {
     };
   },
 };
-export type TgHomunculusDS = BaseDS;
 
 export const isExistByPhone = async (
-  ds: TgHomunculusDS,
   phone: TgHomunculusPhone
 ): Promise<boolean> => {
-  const res = await TgHomunculusTable(ds.knex)
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const res = await TgHomunculusTable(knex)
     .where({
       phone,
     })
@@ -33,8 +34,10 @@ export const isExistByPhone = async (
   return !!count && +count > 0;
 };
 
-export const isExistByMaster = async (ds: TgHomunculusDS): Promise<boolean> => {
-  const res = await TgHomunculusTable(ds.knex)
+export const isExistByMaster = async (): Promise<boolean> => {
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const res = await TgHomunculusTable(knex)
     .where({
       master: true,
     })
@@ -45,10 +48,11 @@ export const isExistByMaster = async (ds: TgHomunculusDS): Promise<boolean> => {
 };
 
 export const getByPhone = async (
-  ds: TgHomunculusDS,
   phone: TgHomunculusPhone
 ): Promise<TgHomunculus | undefined> => {
-  const res = await TgHomunculusTable(ds.knex)
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const res = await TgHomunculusTable(knex)
     .where({
       phone,
     })
@@ -57,18 +61,16 @@ export const getByPhone = async (
   return res === undefined ? undefined : TgHomunculusDM.fromTable(res);
 };
 
-export const create = async (
-  ds: TgHomunculusDS,
-  projection: TgHomunculus
-): Promise<void> => {
-  await TgHomunculusTable(ds.knex).insert(projection);
+export const create = async (projection: TgHomunculus): Promise<void> => {
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  await TgHomunculusTable(knex).insert(projection);
 };
 
-export const update = async (
-  ds: TgHomunculusDS,
-  projection: TgHomunculus
-): Promise<void> => {
-  await TgHomunculusTable(ds.knex)
+export const update = async (projection: TgHomunculus): Promise<void> => {
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  await TgHomunculusTable(knex)
     .where({ phone: projection.phone })
     .update(projection);
 };

@@ -1,18 +1,22 @@
+import { CommandOrQuery, CommandQueryHandler } from "@fdd-node/core/cqrs";
+import { EventBus } from "@fdd-node/core/eda";
+import { InternalError, PermissionDeniedError } from "@fdd-node/core/errors";
+import { Maybe, pipe } from "@fop-ts/core";
+import { curry } from "@fop-ts/core/function/curry";
 import { ApolloServer } from "apollo-server";
 import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import { ResolversCtx } from "apps/main-gql/infra/gql/resolver-ctx";
 import { schema } from "apps/main-gql/infra/gql/shema";
-import { EventBusService } from "fdd-ts/eda";
-import { InternalError, PermissionDeniedError } from "fdd-ts/errors";
-import { Maybe, pipeAsync } from "functional-oriented-programming-ts";
 import { GraphQLError } from "graphql";
-import { Knex } from "knex";
+import { Context } from "libs/fdd-ts/context";
 import { UserTable } from "libs/main-db/models";
+import {
+  GlobalContext,
+  GlobalContextStorage,
+} from "libs/teleadmin/contexts/global";
 import { JWTToken } from "libs/teleadmin/jwt-token";
 import { isAuthenticated } from "libs/teleadmin/permissions/cq/is-authenticated";
 import { IsNotDemo } from "libs/teleadmin/permissions/cq/is-not-demo";
-import { BaseDS } from "libs/teleadmin/projections/ds";
-import { TelegramClientRef } from "libs/telegram-js/client";
 import { AuthenticateCmdHandler } from "modules/ia/command/handlers/authenticate";
 import { CreateFirstAdminCmdHandler } from "modules/ia/command/handlers/create-first-admin";
 import { CreateUserCmdHandler } from "modules/ia/command/handlers/create-user";
@@ -23,24 +27,20 @@ import { CreateAndSetMainApplicationCmdHandler } from "modules/main/command/hand
 import { CreateAndSetMasterHomunculusCmdHandler } from "modules/main/command/handlers/create-and-set-main-homunculus";
 import { LeaveAndDeleteSourceCmdHandler } from "modules/main/command/handlers/leave-and-delete-source";
 import { ParseTgSourceParticipantsCmdHandler } from "modules/main/command/handlers/parse-tg-source-participants";
-import { Logger } from "winston";
 
-export const initServer = (
-  logger: Logger,
-  eventBus: EventBusService,
-  knex: Knex,
-  telegramClient: TelegramClientRef,
-  jwtSecret: string,
-  passwordHashSalt: string
-) => {
+export const initServer = (jwtSecret: string, passwordHashSalt: string) => {
+  const storage = Context.getStoreOrThrowError(GlobalContext);
+
   return new ApolloServer({
     schema,
     context: async ({
       req,
     }): Promise<ResolversCtx | { token?: string; userId?: string }> => {
+      const { logger } = Context.getStoreOrThrowError(GlobalContext);
+
       // . TX
       logger.debug("CREATING TX");
-      const tx = await knex.transaction();
+      const tx = await storage.knex.transaction();
       logger.debug("TX CREATED");
 
       // . AUTH_N
@@ -63,58 +63,61 @@ export const initServer = (
       }
 
       // . EDA
-      const txEventBus = await eventBus.tx();
+      const txEventBus = await EventBus.tx(storage.eventBus);
 
-      // . DS
-      const baseDS: BaseDS = {
+      // . Global context
+      const workflowContextStorage = GlobalContextStorage.create({
+        ...storage,
         knex: tx,
-        logger,
-      };
+        eventBus: txEventBus,
+      });
 
       // . ASPECTS
-      const isAuthenticatedAndNotDemoAspect = pipeAsync(
-        isAuthenticated,
-        IsNotDemo(tx)
+      const contextAspect = <CQ extends CommandOrQuery<any, any>, R>(
+        handler: CommandQueryHandler<CQ, R>
+      ) => Context.runC2(GlobalContext, workflowContextStorage, handler);
+      const isAuthenticatedAndNotDemoAspect = pipe(
+        curry(IsNotDemo),
+        isAuthenticated
       );
 
       // . COMMAND HANDLERS
-      const createFirstAdmin = CreateFirstAdminCmdHandler(baseDS);
-      const createUser = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        CreateUserCmdHandler(baseDS)
-      );
-      const authenticate = AuthenticateCmdHandler(jwtSecret, baseDS);
-      const createAndSetMainApplicationCmdHandler = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        CreateAndSetMainApplicationCmdHandler(baseDS)
-      );
+      const createFirstAdmin = pipe(contextAspect)(CreateFirstAdminCmdHandler);
 
-      const createAndSetMasterHomunculusCmdHandler = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        CreateAndSetMasterHomunculusCmdHandler(baseDS, txEventBus)
-      );
+      const createUser = pipe(
+        contextAspect,
+        isAuthenticatedAndNotDemoAspect
+      )(CreateUserCmdHandler);
 
-      const addPublicSourceCmdHandler = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        AddPublicSourceCmdHandler(telegramClient, txEventBus, baseDS)
-      );
-      const addPrivateSourceCmdHandler = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        AddPrivateSourceCmdHandler(telegramClient, txEventBus, baseDS)
-      );
-      const parseTgSourceParticipantsCmdHandler = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        ParseTgSourceParticipantsCmdHandler(
-          logger,
-          telegramClient,
-          txEventBus,
-          baseDS
-        )
-      );
-      const leaveAndDeleteSourceCmdHandler = pipeAsync(
-        isAuthenticatedAndNotDemoAspect,
-        LeaveAndDeleteSourceCmdHandler(telegramClient, baseDS)
-      );
+      const authenticateCmdHandler = AuthenticateCmdHandler(jwtSecret);
+      const createAndSetMainApplicationCmdHandler = pipe(
+        contextAspect,
+        isAuthenticatedAndNotDemoAspect
+      )(CreateAndSetMainApplicationCmdHandler);
+
+      const createAndSetMasterHomunculusCmdHandler = pipe(
+        contextAspect,
+        isAuthenticatedAndNotDemoAspect
+      )(CreateAndSetMasterHomunculusCmdHandler);
+
+      const addPublicSourceCmdHandler = pipe(
+        contextAspect,
+        isAuthenticatedAndNotDemoAspect
+      )(AddPublicSourceCmdHandler);
+      const addPrivateSourceCmdHandler = pipe(
+        contextAspect,
+        isAuthenticatedAndNotDemoAspect
+      )(AddPrivateSourceCmdHandler);
+
+      const parseTgSourceParticipantsCmdHandler = pipe(
+        contextAspect,
+        isAuthenticatedAndNotDemoAspect
+      )(ParseTgSourceParticipantsCmdHandler);
+
+      const leaveAndDeleteSourceCmdHandler = pipe(
+        contextAspect,
+        isAuthenticatedAndNotDemoAspect
+      )(LeaveAndDeleteSourceCmdHandler);
 
       return {
         tx,
@@ -136,7 +139,7 @@ export const initServer = (
             commands: {
               createFirstAdmin,
               createUser,
-              authenticate,
+              authenticate: authenticateCmdHandler,
             },
           },
         },
@@ -158,6 +161,8 @@ export const initServer = (
         requestDidStart: async () => {
           return {
             willSendResponse: async (ctx) => {
+              const { logger } = Context.getStoreOrThrowError(GlobalContext);
+
               if (ctx.errors && ctx.errors.length > 0) {
                 return;
               }
@@ -166,20 +171,22 @@ export const initServer = (
                 logger.debug("COMMITTING");
                 await ctx.context.tx.commit();
                 logger.debug("COMMITTED");
-                await ctx.context.eventBus.commit();
+                await EventBus.commit(ctx.context.eventBus);
               } catch (e) {
-                logger.error(e);
+                logger.error("willSendResponse", e);
                 throw e;
               }
             },
             didEncounterErrors: async (ctx) => {
+              const { logger } = Context.getStoreOrThrowError(GlobalContext);
+
               try {
                 logger.debug("ROLLING");
                 await ctx.context.tx.rollback();
                 logger.debug("ROLLED");
-                await ctx.context.eventBus.rollback();
+                await EventBus.rollback(ctx.context.eventBus);
               } catch (e) {
-                logger.error(e);
+                logger.error("didEncounterErrors", e);
                 throw e;
               }
             },

@@ -1,10 +1,11 @@
+import { Context } from "libs/fdd-ts/context";
 import {
   TgSourceParticipantStatusTable,
   TgSourceParticipantStatusTableName,
   TgSourceParticipantTable,
   TgSourceParticipantTableName,
 } from "libs/main-db/models";
-import { BaseDS } from "libs/teleadmin/projections/ds";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
 import { TgSourceId } from "modules/main/command/projections/tg-source";
 import {
   TgSourceParticipant,
@@ -22,28 +23,26 @@ export const TgSourceParticipantDM = {
     };
   },
 };
-export type TgSourceParticipantDS = BaseDS;
 
 export const getTgSourceIdAndTgUserIdNotInWithStatusJoinedRejoined = async (
-  ds: TgSourceParticipantDS,
   tgSourceId: TgSourceId,
   tgUserIds: TgUserId[]
 ): Promise<TgSourceParticipant[]> => {
-  const result = await ds
-    .knex<TgSourceParticipantTable>({
-      a: TgSourceParticipantTableName,
-    })
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const result = await knex<TgSourceParticipantTable>({
+    a: TgSourceParticipantTableName,
+  })
     .whereNotIn("tgUserId", tgUserIds)
     .andWhere("tgSourceId", tgSourceId)
     .andWhere(
-      ds.knex.raw(
+      knex.raw(
         "0 < ?",
-        ds
-          .knex<TgSourceParticipantStatusTable>({
-            b: TgSourceParticipantStatusTableName,
-          })
+        knex<TgSourceParticipantStatusTable>({
+          b: TgSourceParticipantStatusTableName,
+        })
           // TODO. User const variable
-          .where(ds.knex.raw(`"a"."id" = "b"."tg_source_participant_id"`))
+          .where(knex.raw(`"a"."id" = "b"."tg_source_participant_id"`))
           .whereIn("type", ["Joined", "Rejoined"])
           .groupBy("createdAt")
           .orderBy("createdAt", "desc")
@@ -56,11 +55,12 @@ export const getTgSourceIdAndTgUserIdNotInWithStatusJoinedRejoined = async (
 };
 
 export const findByTgUserIdAndTgSourceId = async (
-  ds: TgSourceParticipantDS,
   tgUserId: TgUserId,
   tgSourceId: TgSourceId
 ): Promise<TgSourceParticipant | undefined> => {
-  const res = await TgSourceParticipantTable(ds.knex)
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
+  const res = await TgSourceParticipantTable(knex)
     .where({
       tgUserId,
       tgSourceId,
@@ -71,15 +71,16 @@ export const findByTgUserIdAndTgSourceId = async (
 };
 
 export const create = async (
-  ds: TgSourceParticipantDS,
   projection: TgSourceParticipant,
   ignoreTgId: boolean = false
 ): Promise<void> => {
+  const { knex } = Context.getStoreOrThrowError(GlobalContext);
+
   if (!ignoreTgId) {
-    return TgSourceParticipantTable(ds.knex).insert(projection);
+    return TgSourceParticipantTable(knex).insert(projection);
   }
 
-  await TgSourceParticipantTable(ds.knex)
+  await TgSourceParticipantTable(knex)
     .insert(projection)
     .onConflict(["tgSourceId", "tgUserId"])
     .ignore();

@@ -1,4 +1,4 @@
-import { PublicError } from "fdd-ts/errors";
+import { PublicError } from "@fdd-node/core/errors";
 
 export class UserAlreadyInChannelError extends PublicError {
   constructor() {

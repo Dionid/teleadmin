@@ -1,6 +1,6 @@
+import { countToNumber } from "@fdd-node/core/knex-utils";
 import { TgSourceResolvers } from "apps/main-gql/infra/gql/gqlgen-types";
 import { ResolversCtx } from "apps/main-gql/infra/gql/resolver-ctx";
-import { countToNumber } from "fdd-ts/knex-utils";
 import { TgSourceParticipantTable } from "libs/main-db/models";
 
 export const TgSourceQuery: TgSourceResolvers<ResolversCtx> = {

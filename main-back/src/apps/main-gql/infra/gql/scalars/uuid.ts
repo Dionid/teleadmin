@@ -1,4 +1,4 @@
-import { ValidationError } from "fdd-ts/errors";
+import { ValidationError } from "@fdd-node/core/errors";
 import { GraphQLScalarType, Kind } from "graphql";
 import { validate } from "uuid";
 

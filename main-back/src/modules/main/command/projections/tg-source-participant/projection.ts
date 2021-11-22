@@ -1,5 +1,5 @@
-import { UUID } from "fdd-ts/fop-utils";
-import { BrandedPrimitive } from "functional-oriented-programming-ts/branded";
+import { UUID } from "@fdd-node/core/fop-utils";
+import { BrandedPrimitive } from "@fop-ts/core/branded";
 import { TgSourceParticipantTable } from "libs/main-db/models";
 import { TgSourceId } from "modules/main/command/projections/tg-source";
 import { TgUserId } from "modules/main/command/projections/tg-user";

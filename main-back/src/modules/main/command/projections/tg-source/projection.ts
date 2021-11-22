@@ -1,9 +1,6 @@
-import { ValidationError } from "fdd-ts/errors";
-import { UUID } from "fdd-ts/fop-utils";
-import {
-  BrandedPrimitive,
-  NotEmptyString,
-} from "functional-oriented-programming-ts/branded";
+import { ValidationError } from "@fdd-node/core/errors";
+import { UUID } from "@fdd-node/core/fop-utils";
+import { BrandedPrimitive, NotEmptyString } from "@fop-ts/core/branded";
 import { TgSourceTable } from "libs/main-db/models";
 
 export type TgSourceId = BrandedPrimitive<

@@ -1,9 +1,10 @@
-import { Command, CommandFactory } from "fdd-ts/cqrs";
-import { EventBusService } from "fdd-ts/eda";
-import { FullEvent } from "fdd-ts/eda/events";
-import { InternalError, NotFoundError } from "fdd-ts/errors";
+import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
+import { EventBus, FullEvent } from "@fdd-node/core/eda";
+import { InternalError, NotFoundError } from "@fdd-node/core/errors";
+import { telegramClient } from "apps/main-gql/set-tg-client";
+import { Context } from "libs/fdd-ts/context";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
 import { checkIfMeIsChannelAdmin } from "libs/telegram-js/check-if-me-is-channel-admin";
-import { TelegramClientRef } from "libs/telegram-js/client";
 import { getAllChannelParticipants } from "libs/telegram-js/get-channel-partisipants";
 import { TgSourceParticipantsParsedEvent } from "modules/main/command/handlers/parse-tg-source-participants/events";
 import { markLeftParticipants } from "modules/main/command/handlers/parse-tg-source-participants/operations/mark-left-participants";
@@ -11,7 +12,6 @@ import {
   tgUserDoesntExist,
   tgUserExist,
 } from "modules/main/command/handlers/parse-tg-source-participants/operations/user-presence";
-import { MainModuleDS } from "modules/main/command/projections";
 import { TgSourceId } from "modules/main/command/projections/tg-source";
 import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import {
@@ -20,7 +20,6 @@ import {
   TgUserTgId,
 } from "modules/main/command/projections/tg-user";
 import { Api } from "telegram";
-import { Logger } from "winston";
 
 import User = Api.User;
 import ChannelParticipants = Api.channels.ChannelParticipants;
@@ -33,81 +32,71 @@ export type ParseTgSourceParticipantsCmd = Command<
   }
 >;
 export const ParseTgSourceParticipantsCmd =
-  CommandFactory<ParseTgSourceParticipantsCmd>("ParseTgSourceParticipantsCmd");
+  CommandBehaviorFactory<ParseTgSourceParticipantsCmd>(
+    "ParseTgSourceParticipantsCmd"
+  );
 
-const isUser =
-  (logger: Logger) =>
-  (u: TypeUser): u is User => {
-    const val = u instanceof User;
+const isUser = (u: TypeUser): u is User => {
+  const { logger } = Context.getStoreOrThrowError(GlobalContext);
 
-    if (!val) {
-      logger.warn(`Is not type User`, u);
-    }
+  const val = u instanceof User;
 
-    return val;
-  };
+  if (!val) {
+    logger.warn(`Is not type User`, u);
+  }
+
+  return val;
+};
 
 export type ParseTgSourceParticipantsCmdHandler =
   typeof ParseTgSourceParticipantsCmdHandler;
 
-export const ParseTgSourceParticipantsCmdHandler =
-  (
-    logger: Logger,
-    client: TelegramClientRef,
-    eventBus: EventBusService,
-    ds: MainModuleDS
-  ) =>
-  async (cmd: ParseTgSourceParticipantsCmd) => {
-    // . Check that TgSource is exist
-    const source = await TgSourceDS.findByIdAndNotDeleted(
-      ds,
-      cmd.data.sourceId
+export const ParseTgSourceParticipantsCmdHandler = async (
+  cmd: ParseTgSourceParticipantsCmd
+) => {
+  const { eventBus } = Context.getStoreOrThrowError(GlobalContext);
+  // . Check that TgSource is exist
+  const source = await TgSourceDS.findByIdAndNotDeleted(cmd.data.sourceId);
+
+  if (!source) {
+    throw new NotFoundError(`Source with tg id ${cmd.data.sourceId} not found`);
+  }
+
+  // . Check if homunculus is admin
+  await checkIfMeIsChannelAdmin(telegramClient, source.tgId);
+
+  // . Get participants
+  const tgAllParticipants = await getAllChannelParticipants(
+    telegramClient,
+    source.tgId
+  );
+
+  if (!(tgAllParticipants instanceof ChannelParticipants)) {
+    throw new InternalError(
+      "Result of Api.channels.GetParticipants is not ChannelParticipants"
     );
+  }
 
-    if (!source) {
-      throw new NotFoundError(
-        `Source with tg id ${cmd.data.sourceId} not found`
-      );
-    }
+  // . Parse
+  const tgUsers: TgUser[] = await Promise.all(
+    tgAllParticipants.users.filter(isUser).map(async (user) => {
+      const tgUser = await TgUserDS.findByTgId(TgUserTgId.ofString(user.id));
 
-    // . Check if homunculus is admin
-    await checkIfMeIsChannelAdmin(client.ref, source.tgId);
+      if (!tgUser) {
+        return await tgUserDoesntExist(user, source.id);
+      }
 
-    // . Get participants
-    const tgAllParticipants = await getAllChannelParticipants(
-      client.ref,
-      source.tgId
-    );
+      return await tgUserExist(tgUser, user, source);
+    })
+  );
 
-    if (!(tgAllParticipants instanceof ChannelParticipants)) {
-      throw new InternalError(
-        "Result of Api.channels.GetParticipants is not ChannelParticipants"
-      );
-    }
+  // . Get all participants not in this list & status "Joined" | "Rejoined" -> "Left"
+  await markLeftParticipants(tgUsers, source);
 
-    // . Parse
-    const tgUsers: TgUser[] = await Promise.all(
-      tgAllParticipants.users.filter(isUser(logger)).map(async (user) => {
-        const tgUser = await TgUserDS.findByTgId(
-          ds,
-          TgUserTgId.ofString(user.id)
-        );
-
-        if (!tgUser) {
-          return await tgUserDoesntExist(ds, user, source.id);
-        }
-
-        return await tgUserExist(ds, tgUser, user, source);
-      })
-    );
-
-    // . Get all participants not in this list & status "Joined" | "Rejoined" -> "Left"
-    await markLeftParticipants(ds, tgUsers, source);
-
-    eventBus.publish([
-      FullEvent.fromCmdOrQuery({
-        event: TgSourceParticipantsParsedEvent.create({}),
-        meta: cmd.meta,
-      }),
-    ]);
-  };
+  EventBus.publish(eventBus, [
+    FullEvent.ofCmdOrQuery({
+      event: TgSourceParticipantsParsedEvent.create({}),
+      meta: cmd.meta,
+    }),
+  ]);
+};

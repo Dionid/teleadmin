@@ -1,8 +1,9 @@
-import { Event, FullEvent, EventBus } from "fdd-ts/eda";
-import { CriticalError } from "fdd-ts/errors";
-import { NotEmptyString } from "functional-oriented-programming-ts/branded";
-import { Knex } from "knex";
+import { Event, FullEvent, EventBus } from "@fdd-node/core/eda";
+import { CriticalError } from "@fdd-node/core/errors";
+import { NotEmptyString } from "@fop-ts/core/branded";
+import { Context } from "libs/fdd-ts/context";
 import { TgApplicationTable } from "libs/main-db/models";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
 import { CreatedAndSettedMasterHomunculusEvent } from "modules/main/command/handlers/create-and-set-main-homunculus";
 import {
   SetAuthTokenToHomunculusCmd,
@@ -11,7 +12,6 @@ import {
 import { TgHomunculusPhone } from "modules/main/command/projections/tg-homunculus";
 import { TelegramClient } from "telegram";
 import { StringSession } from "telegram/sessions";
-import { Logger } from "winston";
 
 export type HomunculusPhoneCodeReceived = Event<
   "HomunculusPhoneCodeReceived",
@@ -22,17 +22,14 @@ export type HomunculusPhoneCodeReceived = Event<
   }
 >;
 
-export const initCreatedAndSettedMasterHomunculusEventHandler = (
-  logger: Logger,
-  eventBus: EventBus,
-  knex: Knex
-) => {
+export const initCreatedAndSettedMasterHomunculusEventHandler = () => {
+  const storage = Context.getStoreOrThrowError(GlobalContext);
   EventBus.subscribe<CreatedAndSettedMasterHomunculusEvent>(
-    eventBus,
-    CreatedAndSettedMasterHomunculusEvent.type,
+    storage.eventBus,
+    CreatedAndSettedMasterHomunculusEvent.name(),
     async (event) => {
       // . Get TgApp.apiId and tgApp.apiHash
-      const result = await TgApplicationTable(knex)
+      const result = await TgApplicationTable(storage.knex)
         .where({ main: true })
         .select("appId", "appHash");
       const mainApp = result[0];
@@ -55,12 +52,15 @@ export const initCreatedAndSettedMasterHomunculusEventHandler = (
       await client.start({
         phoneNumber: event.data.phone,
         phoneCode: async () => {
-          logger.debug("Waiting for code");
+          storage.logger.debug("Waiting for code");
 
           for await (const e of EventBus.observe<
             FullEvent<HomunculusPhoneCodeReceived>
-          >(eventBus, "HomunculusPhoneCodeReceived")) {
-            logger.debug("HomunculusPhoneCodeReceived EVENT RECEIVED", e.data);
+          >(storage.eventBus, "HomunculusPhoneCodeReceived")) {
+            storage.logger.debug(
+              "HomunculusPhoneCodeReceived EVENT RECEIVED",
+              e.data
+            );
 
             if (e.data.data.phone === event.data.phone) {
               e.stop();
@@ -76,25 +76,28 @@ export const initCreatedAndSettedMasterHomunculusEventHandler = (
         },
       });
 
-      logger.info("You should now be connected.");
+      storage.logger.info("You should now be connected.");
 
       const authToken = client.session.save() as unknown as NotEmptyString;
 
-      await knex.transaction(async (tx) => {
-        await SetAuthTokenToHomunculusCmdHandler(
+      await storage.knex.transaction(async (tx) => {
+        await Context.run(
+          GlobalContext,
           {
+            ...storage,
             knex: tx,
-            logger,
           },
-          eventBus
-        )(
-          SetAuthTokenToHomunculusCmd.create(
-            {
-              phone: event.data.phone,
-              authToken,
-            },
-            { userId: null }
-          )
+          async () => {
+            await SetAuthTokenToHomunculusCmdHandler(
+              SetAuthTokenToHomunculusCmd.create(
+                {
+                  phone: event.data.phone,
+                  authToken,
+                },
+                { userId: null }
+              )
+            );
+          }
         );
       });
     }

@@ -1,4 +1,8 @@
-import { InternalError, NotFoundError, returnOnThrow } from "fdd-ts/errors";
+import {
+  InternalError,
+  NotFoundError,
+  returnOnThrow,
+} from "@fdd-node/core/errors";
 import { Api, TelegramClient } from "telegram";
 
 import ChannelParticipants = Api.channels.ChannelParticipants;

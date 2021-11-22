@@ -1,12 +1,17 @@
-import { CommandOrQuery } from "fdd-ts/cqrs";
-import { PermissionDeniedError } from "fdd-ts/errors";
+import { CommandOrQuery, CommandQueryHandler } from "@fdd-node/core/cqrs";
+import { PermissionDeniedError } from "@fdd-node/core/errors";
 
-export const isAuthenticated = async <CQ extends CommandOrQuery<any, any>>(
-  cq: CQ
-): Promise<CQ> => {
-  if (!cq.meta.userId) {
-    throw new PermissionDeniedError(`User must be authenticated`);
-  }
+export const isAuthenticated =
+  <CQ extends CommandOrQuery<any, any>, R>(
+    handler: CommandQueryHandler<CQ, R>
+  ) =>
+  async (cq: CQ): Promise<R> => {
+    console.log("ISAUTHENTICATED");
+    console.log(cq);
 
-  return cq;
-};
+    if (!cq.meta.userId) {
+      throw new PermissionDeniedError(`User must be authenticated`);
+    }
+
+    return handler(cq);
+  };

@@ -1,6 +1,5 @@
-import { CommandFactory, Hybrid } from "fdd-ts/cqrs";
+import { CommandBehaviorFactory, Hybrid } from "@fdd-node/core/cqrs";
 import { JWTToken } from "libs/teleadmin/jwt-token";
-import { IAModuleDS } from "modules/ia/command/projections";
 import {
   UserDS,
   UserEmail,
@@ -23,14 +22,14 @@ export type AuthenticateCmd = Hybrid<
     jwtToken: string;
   }
 >;
-export const AuthenticateCmd = CommandFactory("AuthenticateCmd");
+export const AuthenticateCmd = CommandBehaviorFactory("AuthenticateCmd");
 
 export type AuthenticateCmdHandler = ReturnType<typeof AuthenticateCmdHandler>;
 
 export const AuthenticateCmdHandler =
-  (salt: string, commonDS: IAModuleDS) => async (cmd: AuthenticateCmd) => {
+  (salt: string) => async (cmd: AuthenticateCmd) => {
     // . Get user
-    const user = await UserDS.findByEmail(commonDS, cmd.data.email);
+    const user = await UserDS.findByEmail(cmd.data.email);
 
     if (!user) {
       throw new EmailOrPasswordIsIncorrect();

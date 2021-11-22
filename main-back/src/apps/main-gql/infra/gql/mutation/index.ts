@@ -1,6 +1,7 @@
+import { EventBus } from "@fdd-node/core/eda";
+import { NotEmptyString } from "@fop-ts/core/branded";
 import { MutationResolvers } from "apps/main-gql/infra/gql/gqlgen-types";
 import { ResolversCtx } from "apps/main-gql/infra/gql/resolver-ctx";
-import { NotEmptyString } from "functional-oriented-programming-ts/branded";
 import { TgSourceInviteLinkHash } from "libs/telegram-js/types";
 import { AuthenticateCmd } from "modules/ia/command/handlers/authenticate";
 import { CreateFirstAdminCmd } from "modules/ia/command/handlers/create-first-admin";
@@ -120,8 +121,9 @@ export const Mutation: MutationResolvers<ResolversCtx> = {
   },
 
   sendCode: async (parent, args, ctx) => {
+    // . TODO. Add is Authenticated aspect
     const event: HomunculusPhoneCodeReceived = {
-      type: "HomunculusPhoneCodeReceived",
+      name: "HomunculusPhoneCodeReceived",
       version: "v1",
       data: {
         phone: TgHomunculusPhone.ofString(args.req.phone),
@@ -129,7 +131,7 @@ export const Mutation: MutationResolvers<ResolversCtx> = {
       },
     };
 
-    ctx.eventBus.publish([
+    EventBus.publish(ctx.eventBus, [
       {
         ...event,
         meta: {

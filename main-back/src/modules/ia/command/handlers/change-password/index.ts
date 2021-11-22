@@ -1,6 +1,5 @@
-import { Command } from "fdd-ts/cqrs";
-import { CriticalError } from "fdd-ts/errors";
-import { IAModuleDS } from "modules/ia/command/projections";
+import { Command } from "@fdd-node/core/cqrs";
+import { CriticalError } from "@fdd-node/core/errors";
 import {
   UserDS,
   User,
@@ -17,22 +16,21 @@ export type ChangePasswordCmd = Command<
   }
 >;
 
-export const ChangePasswordCmdHandler =
-  (commonDS: IAModuleDS) => async (cmd: ChangePasswordCmd) => {
-    // . Get user
-    const user = await UserDS.findById(commonDS, cmd.data.id);
+export const ChangePasswordCmdHandler = async (cmd: ChangePasswordCmd) => {
+  // . Get user
+  const user = await UserDS.findById(cmd.data.id);
 
-    if (!user) {
-      throw new CriticalError("User not found");
-    }
+  if (!user) {
+    throw new CriticalError("User not found");
+  }
 
-    if (!UserHashedPassword.compare(user.password, cmd.data.oldPassword)) {
-      throw new CriticalError(`Old password is incorrect`);
-    }
+  if (!UserHashedPassword.compare(user.password, cmd.data.oldPassword)) {
+    throw new CriticalError(`Old password is incorrect`);
+  }
 
-    const newPassUser: User = {
-      ...user,
-      password: cmd.data.newPassword,
-    };
-    await UserDS.update(commonDS, newPassUser);
+  const newPassUser: User = {
+    ...user,
+    password: cmd.data.newPassword,
   };
+  await UserDS.update(newPassUser);
+};
