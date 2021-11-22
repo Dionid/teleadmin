@@ -648,10 +648,10 @@
   resolved "https://registry.yarnpkg.com/@fop-ts/core/-/core-0.0.17.tgz#60a059e3cc22d7aae2b488aa4da0563d9ae3d1df"
   integrity sha512-JUG2vPO18rBedTARG93lMbmqwdJCvZuV14oHEPDOxyIk8pPhokXUJfRfvgnKk2h6M4jjM/bk/JEeayDI6k5nUQ==
 
-"@fop-ts/core@^0.0.18":
-  version "0.0.18"
-  resolved "https://registry.yarnpkg.com/@fop-ts/core/-/core-0.0.18.tgz#1c56aa981525e6954c911dfc00790c3fa7a667ce"
-  integrity sha512-cI1U/+vm4E08Gz4yFb2vHXqtOY1POPMeXZouI2byQD2CH8f+ppC+zlOK2nXTiZxMlqLLQIIbUKdHiog24Rix0w==
+"@fop-ts/core@^0.0.19":
+  version "0.0.19"
+  resolved "https://registry.yarnpkg.com/@fop-ts/core/-/core-0.0.19.tgz#3b73c40ef44ed72387f1a778973817520600561d"
+  integrity sha512-FqrQ74GonkrsgxhxuprXYkN2nDt+ZKr5KT5w8PXIcDfyOO7WVKBn/G6xO/dYz0Lrx01auCn4ckcAkkGFOFdKxg==
 
 "@graphql-codegen/cli@^1.21.6":
   version "1.21.8"

@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@fdd-node/core": "^0.0.11",
-    "@fop-ts/core": "^0.0.18",
+    "@fop-ts/core": "^0.0.19",
     "abort-controller-x": "^0.2.6",
     "apollo-server": "^3.4.0",
     "cron": "^1.8.2",
