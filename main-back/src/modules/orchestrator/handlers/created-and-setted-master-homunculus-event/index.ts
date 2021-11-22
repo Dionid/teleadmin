@@ -4,7 +4,6 @@ import { NotEmptyString } from "@fop-ts/core/branded";
 import { Context } from "libs/fdd-ts/context";
 import { TgApplicationTable } from "libs/main-db/models";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
-import { appLogger } from "libs/teleadmin/deps/logger";
 import { CreatedAndSettedMasterHomunculusEvent } from "modules/main/command/handlers/create-and-set-main-homunculus";
 import {
   SetAuthTokenToHomunculusCmd,
@@ -53,12 +52,12 @@ export const initCreatedAndSettedMasterHomunculusEventHandler = () => {
       await client.start({
         phoneNumber: event.data.phone,
         phoneCode: async () => {
-          appLogger.debug("Waiting for code");
+          storage.logger.debug("Waiting for code");
 
           for await (const e of EventBus.observe<
             FullEvent<HomunculusPhoneCodeReceived>
           >(storage.eventBus, "HomunculusPhoneCodeReceived")) {
-            appLogger.debug(
+            storage.logger.debug(
               "HomunculusPhoneCodeReceived EVENT RECEIVED",
               e.data
             );
@@ -77,7 +76,7 @@ export const initCreatedAndSettedMasterHomunculusEventHandler = () => {
         },
       });
 
-      appLogger.info("You should now be connected.");
+      storage.logger.info("You should now be connected.");
 
       const authToken = client.session.save() as unknown as NotEmptyString;
 

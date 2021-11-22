@@ -121,6 +121,7 @@ export const Mutation: MutationResolvers<ResolversCtx> = {
   },
 
   sendCode: async (parent, args, ctx) => {
+    // . TODO. Add is Authenticated aspect
     const event: HomunculusPhoneCodeReceived = {
       name: "HomunculusPhoneCodeReceived",
       version: "v1",

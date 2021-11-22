@@ -1,3 +1,4 @@
+import { CommandOrQuery, CommandQueryHandler } from "@fdd-node/core/cqrs";
 import { EventBus } from "@fdd-node/core/eda";
 import { InternalError, PermissionDeniedError } from "@fdd-node/core/errors";
 import { Maybe, pipe } from "@fop-ts/core";
@@ -13,7 +14,6 @@ import {
   GlobalContext,
   GlobalContextStorage,
 } from "libs/teleadmin/contexts/global";
-import { appLogger } from "libs/teleadmin/deps/logger";
 import { JWTToken } from "libs/teleadmin/jwt-token";
 import { isAuthenticated } from "libs/teleadmin/permissions/cq/is-authenticated";
 import { IsNotDemo } from "libs/teleadmin/permissions/cq/is-not-demo";
@@ -36,10 +36,12 @@ export const initServer = (jwtSecret: string, passwordHashSalt: string) => {
     context: async ({
       req,
     }): Promise<ResolversCtx | { token?: string; userId?: string }> => {
+      const { logger } = Context.getStoreOrThrowError(GlobalContext);
+
       // . TX
-      appLogger.debug("CREATING TX");
+      logger.debug("CREATING TX");
       const tx = await storage.knex.transaction();
-      appLogger.debug("TX CREATED");
+      logger.debug("TX CREATED");
 
       // . AUTH_N
       const headerToken = req.headers.authorization;
@@ -71,39 +73,49 @@ export const initServer = (jwtSecret: string, passwordHashSalt: string) => {
       });
 
       // . ASPECTS
+      const contextAspect = <CQ extends CommandOrQuery<any, any>, R>(
+        handler: CommandQueryHandler<CQ, R>
+      ) => Context.runC2(GlobalContext, workflowContextStorage, handler);
       const isAuthenticatedAndNotDemoAspect = pipe(
         curry(IsNotDemo),
         isAuthenticated
       );
 
       // . COMMAND HANDLERS
-      const createFirstAdmin = CreateFirstAdminCmdHandler;
+      const createFirstAdmin = pipe(contextAspect)(CreateFirstAdminCmdHandler);
 
-      const createUser = pipe(isAuthenticatedAndNotDemoAspect)(
-        CreateUserCmdHandler
-      );
+      const createUser = pipe(
+        contextAspect,
+        isAuthenticatedAndNotDemoAspect
+      )(CreateUserCmdHandler);
 
       const authenticateCmdHandler = AuthenticateCmdHandler(jwtSecret);
       const createAndSetMainApplicationCmdHandler = pipe(
+        contextAspect,
         isAuthenticatedAndNotDemoAspect
       )(CreateAndSetMainApplicationCmdHandler);
 
       const createAndSetMasterHomunculusCmdHandler = pipe(
+        contextAspect,
         isAuthenticatedAndNotDemoAspect
       )(CreateAndSetMasterHomunculusCmdHandler);
 
-      const addPublicSourceCmdHandler = pipe(isAuthenticatedAndNotDemoAspect)(
-        AddPublicSourceCmdHandler
-      );
+      const addPublicSourceCmdHandler = pipe(
+        contextAspect,
+        isAuthenticatedAndNotDemoAspect
+      )(AddPublicSourceCmdHandler);
       const addPrivateSourceCmdHandler = pipe(
-        isAuthenticatedAndNotDemoAspect,
-        Context.runC3(GlobalContext, workflowContextStorage)
+        contextAspect,
+        isAuthenticatedAndNotDemoAspect
       )(AddPrivateSourceCmdHandler);
 
       const parseTgSourceParticipantsCmdHandler = pipe(
+        contextAspect,
         isAuthenticatedAndNotDemoAspect
       )(ParseTgSourceParticipantsCmdHandler);
+
       const leaveAndDeleteSourceCmdHandler = pipe(
+        contextAspect,
         isAuthenticatedAndNotDemoAspect
       )(LeaveAndDeleteSourceCmdHandler);
 
@@ -149,28 +161,32 @@ export const initServer = (jwtSecret: string, passwordHashSalt: string) => {
         requestDidStart: async () => {
           return {
             willSendResponse: async (ctx) => {
+              const { logger } = Context.getStoreOrThrowError(GlobalContext);
+
               if (ctx.errors && ctx.errors.length > 0) {
                 return;
               }
 
               try {
-                appLogger.debug("COMMITTING");
+                logger.debug("COMMITTING");
                 await ctx.context.tx.commit();
-                appLogger.debug("COMMITTED");
+                logger.debug("COMMITTED");
                 await EventBus.commit(ctx.context.eventBus);
               } catch (e) {
-                appLogger.error(e);
+                logger.error("willSendResponse", e);
                 throw e;
               }
             },
             didEncounterErrors: async (ctx) => {
+              const { logger } = Context.getStoreOrThrowError(GlobalContext);
+
               try {
-                appLogger.debug("ROLLING");
+                logger.debug("ROLLING");
                 await ctx.context.tx.rollback();
-                appLogger.debug("ROLLED");
+                logger.debug("ROLLED");
                 await EventBus.rollback(ctx.context.eventBus);
               } catch (e) {
-                appLogger.error(e);
+                logger.error("didEncounterErrors", e);
                 throw e;
               }
             },

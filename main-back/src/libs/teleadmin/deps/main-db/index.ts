@@ -3,14 +3,12 @@ import knex, { Knex } from "knex";
 
 import Logger = Knex.Logger;
 
-export let mainDbConnection: Knex;
-
 export const initMainDbConnection = (
   connectionString: string,
   client: "pg",
   logger: Logger
 ): Knex => {
-  mainDbConnection = knex({
+  return knex({
     client,
     debug: true,
     log: logger,
@@ -23,6 +21,4 @@ export const initMainDbConnection = (
     searchPath: ["knex", "public"],
     ...KnexUtils.knexSnakeCaseMappers(),
   });
-
-  return mainDbConnection;
 };

@@ -634,10 +634,10 @@
     ts-node "^9"
     tslib "^2"
 
-"@fdd-node/core@^0.0.10":
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/@fdd-node/core/-/core-0.0.10.tgz#cd257bd4672f4759174f2396557304f595c12f06"
-  integrity sha512-mPEpaFdkgHpQQBCV5ZC5ztTlFgUvoM1mHPxjjWVtiio3DsNC4BADD601mFjXv422hxOHqcRirYgO6OLUqAwfHQ==
+"@fdd-node/core@^0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@fdd-node/core/-/core-0.0.11.tgz#b848e986a2afa31d99c0cc98ef98ca467de8b2c8"
+  integrity sha512-Mdjvo71OcN3n5wPsrfYJMPWXkWbEaX6fqkBB9+PE0f+DhfuzlkGhn7UDME0bQ+ZBKajIvKCr5MuGg/SYSmDbYw==
   dependencies:
     "@fop-ts/core" "^0.0.17"
     knex "^0.95.14"

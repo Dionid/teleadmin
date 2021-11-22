@@ -1,6 +1,6 @@
-import winston, { Logger } from "winston";
+import winston, { Logger as WLogger } from "winston";
 
-export let appLogger: Logger;
+export type Logger = WLogger;
 
 export const initAppLogger = (level: string, service: string): Logger => {
   const devFormat = winston.format.combine(
@@ -19,12 +19,10 @@ export const initAppLogger = (level: string, service: string): Logger => {
     )
   );
 
-  appLogger = winston.createLogger({
+  return winston.createLogger({
     level,
     format: devFormat,
     defaultMeta: { service },
     transports: [new winston.transports.Console()],
   });
-
-  return appLogger;
 };

@@ -4,7 +4,6 @@ import { InternalError, NotFoundError } from "@fdd-node/core/errors";
 import { telegramClient } from "apps/main-gql/set-tg-client";
 import { Context } from "libs/fdd-ts/context";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
-import { appLogger } from "libs/teleadmin/deps/logger";
 import { checkIfMeIsChannelAdmin } from "libs/telegram-js/check-if-me-is-channel-admin";
 import { getAllChannelParticipants } from "libs/telegram-js/get-channel-partisipants";
 import { TgSourceParticipantsParsedEvent } from "modules/main/command/handlers/parse-tg-source-participants/events";
@@ -38,10 +37,12 @@ export const ParseTgSourceParticipantsCmd =
   );
 
 const isUser = (u: TypeUser): u is User => {
+  const { logger } = Context.getStoreOrThrowError(GlobalContext);
+
   const val = u instanceof User;
 
   if (!val) {
-    appLogger.warn(`Is not type User`, u);
+    logger.warn(`Is not type User`, u);
   }
 
   return val;

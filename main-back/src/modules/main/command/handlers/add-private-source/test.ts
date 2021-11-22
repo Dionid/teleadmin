@@ -6,6 +6,7 @@ import { mock, MockProxy } from "jest-mock-extended";
 import { Knex } from "knex";
 import { Context } from "libs/fdd-ts/context";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
+import { Logger } from "libs/teleadmin/deps/logger";
 import { TgSourceInviteLinkHash } from "libs/telegram-js/types";
 import { UserAlreadyInChannelError } from "modules/main/command/handlers/add-private-source/errors";
 import {
@@ -16,7 +17,6 @@ import { TgSourceType } from "modules/main/command/projections/tg-source";
 import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 import { Api } from "telegram";
 import { mocked } from "ts-jest/utils";
-import { Logger } from "winston";
 
 import Updates = Api.Updates;
 import Channel = Api.Channel;

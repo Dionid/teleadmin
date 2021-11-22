@@ -5,6 +5,7 @@ import { mock, MockProxy } from "jest-mock-extended";
 import { Knex } from "knex";
 import { Context } from "libs/fdd-ts/context";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
+import { Logger } from "libs/teleadmin/deps/logger";
 import { checkIfMeIsChannelAdmin } from "libs/telegram-js/check-if-me-is-channel-admin";
 import { getAllChannelParticipants } from "libs/telegram-js/get-channel-partisipants";
 import {
@@ -30,7 +31,6 @@ import {
 } from "modules/main/command/projections/tg-user";
 import { Api } from "telegram";
 import { mocked } from "ts-jest/utils";
-import { Logger } from "winston";
 
 import ChannelParticipant = Api.ChannelParticipant;
 import ChannelParticipants = Api.channels.ChannelParticipants;

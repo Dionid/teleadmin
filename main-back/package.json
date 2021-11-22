@@ -28,7 +28,7 @@
     "typescript": "^4.3.4"
   },
   "dependencies": {
-    "@fdd-node/core": "^0.0.10",
+    "@fdd-node/core": "^0.0.11",
     "@fop-ts/core": "^0.0.18",
     "abort-controller-x": "^0.2.6",
     "apollo-server": "^3.4.0",

@@ -1,10 +1,10 @@
 import * as Env from "@fdd-node/core/env";
 import { NotFoundError } from "@fdd-node/core/errors";
 import { initCronJobs } from "apps/main-gql/cron";
-import { EventBusPersistorService } from "apps/main-gql/event-bus-persistor";
+import { EventBusPersistorSF } from "apps/main-gql/event-bus-persistor";
 import { initServer } from "apps/main-gql/server";
 import { initTgClient } from "apps/main-gql/set-tg-client";
-import { subscribeOnEvents } from "apps/main-gql/subs";
+import { initSubsscribesOnEvents } from "apps/main-gql/subs";
 import * as dotenv from "dotenv";
 import { Context } from "libs/fdd-ts/context";
 import {
@@ -33,7 +33,7 @@ const main = async () => {
   const pg = initMainDbConnection(connectionString, "pg", logger);
 
   // . EDA
-  const eventBusPersistorService = EventBusPersistorService.new({
+  const eventBusPersistorService = EventBusPersistorSF.create({
     knex: pg,
   });
 
@@ -46,10 +46,10 @@ const main = async () => {
   });
 
   await Context.run(GlobalContext, globalCtxStorage, async () => {
-    const { parseSourcesJob } = initCronJobs();
+    const { parseSourcesJob } = initCronJobs(logger);
 
     // . INTERNAL SUBSCRIBE
-    subscribeOnEvents(parseSourcesJob);
+    initSubsscribesOnEvents(parseSourcesJob);
 
     // . ORCHESTRATOR
     initOrchestrator();
@@ -59,7 +59,7 @@ const main = async () => {
 
     // . Set TG Client
     try {
-      await initTgClient(pg, eventBus);
+      await initTgClient();
     } catch (e) {
       if (e instanceof NotFoundError) {
         logger.error(e);

@@ -5,8 +5,9 @@ import {
   FullEvent,
 } from "@fdd-node/core/eda";
 import { NotFoundError } from "@fdd-node/core/errors";
-import { Knex } from "knex";
+import { Context } from "libs/fdd-ts/context";
 import { TgApplicationTable, TgHomunculusTable } from "libs/main-db/models";
+import { GlobalContext } from "libs/teleadmin/contexts/global";
 import { TelegramClient } from "telegram";
 import { StringSession } from "telegram/sessions";
 
@@ -23,10 +24,9 @@ export const TgClientConnectedEvent =
 
 export let telegramClient: TelegramClient;
 
-export const initTgClient = async (
-  knex: Knex,
-  eventBus: EventBus
-): Promise<TelegramClient> => {
+export const initTgClient = async (): Promise<TelegramClient> => {
+  const { knex, eventBus } = Context.getStoreOrThrowError(GlobalContext);
+
   // . Get TgApp.apiId and tgApp.apiHash
   const result = await TgApplicationTable(knex)
     .where({ main: true })

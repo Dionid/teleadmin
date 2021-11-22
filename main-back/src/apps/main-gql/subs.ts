@@ -7,7 +7,6 @@ import {
 import { CronJob } from "cron";
 import { Context } from "libs/fdd-ts/context";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
-import { appLogger } from "libs/teleadmin/deps/logger";
 import {
   ParseInfoAboutHomunculusCmd,
   ParseInfoAboutHomunculusCmdHandler,
@@ -25,14 +24,14 @@ export const CronSourcesParsingCompletedEvent =
     "v1"
   );
 
-export const subscribeOnEvents = (job: CronJob) => {
+export const initSubsscribesOnEvents = (job: CronJob) => {
   const storage = Context.getStoreOrThrowError(GlobalContext);
   EventBus.subscribe<TgClientConnectedEvent>(
     storage.eventBus,
     TgClientConnectedEvent.name(),
     async (event) => {
       await storage.knex.transaction(async (tx) => {
-        Context.run(
+        await Context.run(
           GlobalContext,
           {
             ...storage,
@@ -53,10 +52,10 @@ export const subscribeOnEvents = (job: CronJob) => {
     "AuthTokenToHomunculusSetEvent",
     async (event) => {
       try {
-        await initTgClient(storage.knex, storage.eventBus);
+        await initTgClient();
       } catch (e) {
         if (e instanceof NotFoundError) {
-          appLogger.error(e);
+          storage.logger.error(e);
         } else {
           throw e;
         }

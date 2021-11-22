@@ -3,20 +3,20 @@ import { CronSourcesParsingCompletedEvent } from "apps/main-gql/subs";
 import { CronJob } from "cron";
 import { Context } from "libs/fdd-ts/context";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
-import { appLogger } from "libs/teleadmin/deps/logger";
+import { Logger } from "libs/teleadmin/deps/logger";
 import {
   ParseTgSourceParticipantsCmd,
   ParseTgSourceParticipantsCmdHandler,
 } from "modules/main/command/handlers/parse-tg-source-participants";
 import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
 
-export const initCronJobs = () => {
+export const initCronJobs = (logger: Logger) => {
   const storage = Context.getStoreOrThrowError(GlobalContext);
   const parseSourcesJob = new CronJob("5 0 * * *", async () => {
     const sources = await TgSourceDS.findAllNotDeleted();
     await Promise.all(
       sources.map(async (source) => {
-        appLogger.debug("SOURCE PARSING FIRED");
+        logger.debug("SOURCE PARSING FIRED");
         const cmd: ParseTgSourceParticipantsCmd =
           ParseTgSourceParticipantsCmd.create(
             {
@@ -46,7 +46,7 @@ export const initCronJobs = () => {
     ]);
   });
 
-  appLogger.info(`Cron jobs setted up`);
+  logger.info(`Cron jobs setted up`);
 
   return {
     parseSourcesJob,
