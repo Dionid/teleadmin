@@ -1,8 +1,8 @@
-import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
-import { EventBus } from "@fdd-node/core/eda";
+import { Command, CommandBehavior } from "@fdd-node/core/cqrs/command";
+import { EventBus } from "@fdd-node/core/eda/event-bus";
 import { FullEvent } from "@fdd-node/core/eda/full-event";
 import { PublicError, returnOnThrow } from "@fdd-node/core/errors";
-import { NotEmptyString } from "@fop-ts/core/branded";
+import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { telegramClient } from "apps/main-gql/set-tg-client";
 import { Context } from "libs/fdd-ts/context";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
@@ -27,7 +27,7 @@ export type AddPublicSourceCmd = Command<
   }
 >;
 export const AddPublicSourceCmd =
-  CommandBehaviorFactory<AddPublicSourceCmd>("AddPublicSourceCmd");
+  CommandBehavior.createCurriedType<AddPublicSourceCmd>("AddPublicSourceCmd");
 
 export type AddPublicSourceCmdHandler = ReturnType<
   typeof AddPublicSourceCmdHandler

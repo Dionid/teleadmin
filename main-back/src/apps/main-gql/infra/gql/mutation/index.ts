@@ -1,5 +1,5 @@
-import { EventBus } from "@fdd-node/core/eda";
-import { NotEmptyString } from "@fop-ts/core/branded";
+import { EventBus } from "@fdd-node/core/eda/event-bus";
+import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { MutationResolvers } from "apps/main-gql/infra/gql/gqlgen-types";
 import { ResolversCtx } from "apps/main-gql/infra/gql/resolver-ctx";
 import { TgSourceInviteLinkHash } from "libs/telegram-js/types";

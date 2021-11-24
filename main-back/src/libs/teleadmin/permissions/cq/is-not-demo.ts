@@ -1,10 +1,13 @@
-import { CommandOrQuery, CommandQueryHandler } from "@fdd-node/core/cqrs";
+import {
+  CommandOrQuery,
+  CommandQueryHandler,
+} from "@fdd-node/core/cqrs/common";
 import { CriticalError, PermissionDeniedError } from "@fdd-node/core/errors";
 import { Context } from "libs/fdd-ts/context";
 import { UserTable } from "libs/main-db/models";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
 
-export const IsNotDemo = async <CQ extends CommandOrQuery<any, any>, R>(
+export const IsNotDemo = async <CQ extends CommandOrQuery<any, any, R>, R>(
   handler: CommandQueryHandler<CQ, R>,
   cq: CQ
 ): Promise<R> => {

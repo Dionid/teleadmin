@@ -1,5 +1,5 @@
 import { countMoreThanZero } from "@fdd-node/core/knex-utils";
-import { NotEmptyString } from "@fop-ts/core/branded";
+import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { Context } from "libs/fdd-ts/context";
 import { TgApplicationTable } from "libs/main-db/models";
 import { GlobalContext } from "libs/teleadmin/contexts/global";

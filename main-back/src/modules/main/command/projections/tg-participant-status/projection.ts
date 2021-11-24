@@ -1,5 +1,5 @@
 import { UUID } from "@fdd-node/core/fop-utils";
-import { BrandedPrimitive } from "@fop-ts/core/branded";
+import { BrandedPrimitive } from "@fop-ts/core/Branded";
 import { TgSourceParticipantStatusTable } from "libs/main-db/models";
 import { TgSourceParticipantId } from "modules/main/command/projections/tg-source-participant";
 

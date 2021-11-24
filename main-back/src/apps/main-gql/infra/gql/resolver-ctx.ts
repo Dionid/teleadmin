@@ -1,6 +1,6 @@
-import { CommandHandler } from "@fdd-node/core/cqrs";
-import { EventBus } from "@fdd-node/core/eda";
-import { Maybe } from "@fop-ts/core";
+import { CommandHandler } from "@fdd-node/core/cqrs/command";
+import { EventBus } from "@fdd-node/core/eda/event-bus";
+import { Maybe } from "@fop-ts/core/Types";
 import { Knex } from "knex";
 import { AuthenticateCmdHandler } from "modules/ia/command/handlers/authenticate";
 import { CreateFirstAdminCmdHandler } from "modules/ia/command/handlers/create-first-admin";

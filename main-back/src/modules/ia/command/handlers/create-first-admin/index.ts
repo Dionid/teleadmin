@@ -1,4 +1,4 @@
-import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
+import { Command, CommandBehavior } from "@fdd-node/core/cqrs/command";
 import {
   UserDS,
   User,
@@ -13,9 +13,8 @@ export type CreateFirstAdminCmd = Command<
     password: UserHashedPassword;
   }
 >;
-export const CreateFirstAdminCmd = CommandBehaviorFactory<CreateFirstAdminCmd>(
-  "CreateFirstAdminCmd"
-);
+export const CreateFirstAdminCmd =
+  CommandBehavior.createCurriedType<CreateFirstAdminCmd>("CreateFirstAdminCmd");
 
 export type CreateFirstAdminCmdHandler = typeof CreateFirstAdminCmdHandler;
 

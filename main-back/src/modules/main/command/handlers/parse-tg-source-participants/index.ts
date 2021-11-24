@@ -1,5 +1,6 @@
-import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
-import { EventBus, FullEvent } from "@fdd-node/core/eda";
+import { Command, CommandBehavior } from "@fdd-node/core/cqrs/command";
+import { EventBus } from "@fdd-node/core/eda/event-bus";
+import { FullEvent } from "@fdd-node/core/eda/full-event";
 import { InternalError, NotFoundError } from "@fdd-node/core/errors";
 import { telegramClient } from "apps/main-gql/set-tg-client";
 import { Context } from "libs/fdd-ts/context";
@@ -32,7 +33,7 @@ export type ParseTgSourceParticipantsCmd = Command<
   }
 >;
 export const ParseTgSourceParticipantsCmd =
-  CommandBehaviorFactory<ParseTgSourceParticipantsCmd>(
+  CommandBehavior.createCurriedType<ParseTgSourceParticipantsCmd>(
     "ParseTgSourceParticipantsCmd"
   );
 

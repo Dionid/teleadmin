@@ -1,10 +1,7 @@
-import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
-import {
-  EventBus,
-  Event,
-  EventBehaviourFactory,
-  FullEvent,
-} from "@fdd-node/core/eda";
+import { Command, CommandBehavior } from "@fdd-node/core/cqrs/command";
+import { Event, EventBehavior } from "@fdd-node/core/eda/event";
+import { EventBus } from "@fdd-node/core/eda/event-bus";
+import { FullEvent } from "@fdd-node/core/eda/full-event";
 import { Context } from "libs/fdd-ts/context";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
 import {
@@ -22,7 +19,7 @@ export type CreatedAndSettedMasterHomunculusEvent = Event<
   }
 >;
 export const CreatedAndSettedMasterHomunculusEvent =
-  EventBehaviourFactory.create<CreatedAndSettedMasterHomunculusEvent>(
+  EventBehavior.createCurriedNameVersion<CreatedAndSettedMasterHomunculusEvent>(
     "CreatedAndSettedMasterHomunculusEvent",
     "v1"
   );
@@ -34,7 +31,7 @@ export type CreateAndSetMasterHomunculusCmd = Command<
   }
 >;
 export const CreateAndSetMasterHomunculusCmd =
-  CommandBehaviorFactory<CreateAndSetMasterHomunculusCmd>(
+  CommandBehavior.createCurriedType<CreateAndSetMasterHomunculusCmd>(
     "CreateAndSetMasterHomunculusCmd"
   );
 

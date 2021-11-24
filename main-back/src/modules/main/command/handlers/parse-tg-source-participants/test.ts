@@ -1,4 +1,4 @@
-import { EventBus } from "@fdd-node/core/eda";
+import { EventBus } from "@fdd-node/core/eda/event-bus";
 import { UUID } from "@fdd-node/core/fop-utils";
 import { BigInteger } from "big-integer";
 import { mock, MockProxy } from "jest-mock-extended";

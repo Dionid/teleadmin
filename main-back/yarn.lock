@@ -634,24 +634,19 @@
     ts-node "^9"
     tslib "^2"
 
-"@fdd-node/core@^0.0.11":
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/@fdd-node/core/-/core-0.0.11.tgz#b848e986a2afa31d99c0cc98ef98ca467de8b2c8"
-  integrity sha512-Mdjvo71OcN3n5wPsrfYJMPWXkWbEaX6fqkBB9+PE0f+DhfuzlkGhn7UDME0bQ+ZBKajIvKCr5MuGg/SYSmDbYw==
+"@fdd-node/core@^0.0.12":
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/@fdd-node/core/-/core-0.0.12.tgz#bf02cb32c8e0d616707ec1dadb26d90e915061fa"
+  integrity sha512-aYi70jKObw9TGjcPcVnnf471YZ1oLHNLmUqLTBix4nMpgaUtobK3eXKZ1BfWLP1KYtN1xVcsvTUN2gN8VW48Aw==
   dependencies:
-    "@fop-ts/core" "^0.0.17"
+    "@fop-ts/core" "^0.0.21"
     knex "^0.95.14"
     uuid "^8.3.2"
 
-"@fop-ts/core@^0.0.17":
-  version "0.0.17"
-  resolved "https://registry.yarnpkg.com/@fop-ts/core/-/core-0.0.17.tgz#60a059e3cc22d7aae2b488aa4da0563d9ae3d1df"
-  integrity sha512-JUG2vPO18rBedTARG93lMbmqwdJCvZuV14oHEPDOxyIk8pPhokXUJfRfvgnKk2h6M4jjM/bk/JEeayDI6k5nUQ==
-
-"@fop-ts/core@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@fop-ts/core/-/core-0.0.19.tgz#3b73c40ef44ed72387f1a778973817520600561d"
-  integrity sha512-FqrQ74GonkrsgxhxuprXYkN2nDt+ZKr5KT5w8PXIcDfyOO7WVKBn/G6xO/dYz0Lrx01auCn4ckcAkkGFOFdKxg==
+"@fop-ts/core@^0.0.21":
+  version "0.0.21"
+  resolved "https://registry.yarnpkg.com/@fop-ts/core/-/core-0.0.21.tgz#65ce647226f5e905bc87b1cb6c54f2e88bb28a02"
+  integrity sha512-pH1gA8NyQajds5iWD5F784aMNlAGoiXto/XYa+HF6NoMaFZ7vkgX/RHClN3nB19OrI346caxuRxPY+ybgVbFlg==
 
 "@graphql-codegen/cli@^1.21.6":
   version "1.21.8"

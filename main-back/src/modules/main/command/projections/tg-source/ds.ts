@@ -1,5 +1,5 @@
 import { PublicError } from "@fdd-node/core/errors";
-import { NotEmptyString } from "@fop-ts/core/branded";
+import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { Context } from "libs/fdd-ts/context";
 import { TgSourceTable } from "libs/main-db/models";
 import { GlobalContext } from "libs/teleadmin/contexts/global";

@@ -1,4 +1,4 @@
-import { Event, EventBehaviourFactory } from "@fdd-node/core/eda";
+import { Event, EventBehavior } from "@fdd-node/core/eda/event";
 
 export type TgSourceParticipantsParsedEvent = Event<
   "TgSourceParticipantsParsedEvent",
@@ -6,7 +6,7 @@ export type TgSourceParticipantsParsedEvent = Event<
   Record<any, any>
 >;
 export const TgSourceParticipantsParsedEvent =
-  EventBehaviourFactory.create<TgSourceParticipantsParsedEvent>(
+  EventBehavior.createCurriedNameVersion<TgSourceParticipantsParsedEvent>(
     "TgSourceParticipantsParsedEvent",
     "v1"
   );

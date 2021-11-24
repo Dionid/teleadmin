@@ -1,4 +1,5 @@
-import { EventBus, FullEvent } from "@fdd-node/core/eda";
+import { EventBus } from "@fdd-node/core/eda/event-bus";
+import { FullEvent } from "@fdd-node/core/eda/full-event";
 import { CronSourcesParsingCompletedEvent } from "apps/main-gql/subs";
 import { CronJob } from "cron";
 import { Context } from "libs/fdd-ts/context";

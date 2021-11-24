@@ -1,6 +1,8 @@
-import { EventBus } from "@fdd-node/core/eda";
-import { EventBusInMemory } from "@fdd-node/core/eda-in-memory";
-import { EventBusInMemoryPersistor } from "@fdd-node/core/eda-in-memory/event-bus-inmemory";
+import {
+  EventBusInMemory,
+  EventBusInMemoryPersistor,
+} from "@fdd-node/core/eda-in-memory/event-bus-inmemory";
+import { EventBus } from "@fdd-node/core/eda/event-bus";
 import { Logger } from "libs/teleadmin/deps/logger";
 
 export const initEventBus = (
