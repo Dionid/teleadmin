@@ -1,4 +1,4 @@
-import { Event, EventBehaviourFactory } from "@fdd-node/core/eda";
+import { Event, EventBehavior } from "@fdd-node-ts/core/eda/event";
 import {
   TgSourceId,
   TgSourceTgId,
@@ -15,7 +15,7 @@ export type PublicSourceAddedEvent = Event<
   }
 >;
 export const PublicSourceAddedEvent =
-  EventBehaviourFactory.create<PublicSourceAddedEvent>(
+  EventBehavior.createCurriedNameVersion<PublicSourceAddedEvent>(
     "PublicSourceAdded",
     "v1.1"
   );

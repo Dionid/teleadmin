@@ -1,10 +1,7 @@
-import {
-  Event,
-  EventBus,
-  EventBehaviourFactory,
-  FullEvent,
-} from "@fdd-node/core/eda";
-import { NotFoundError } from "@fdd-node/core/errors";
+import { Event, EventBehavior } from "@fdd-node-ts/core/eda/event";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { FullEvent } from "@fdd-node-ts/core/eda/full-event";
+import { NotFoundError } from "@fdd-node-ts/core/errors";
 import { Context } from "libs/fdd-ts/context";
 import { TgApplicationTable, TgHomunculusTable } from "libs/main-db/models";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
@@ -17,7 +14,7 @@ export type TgClientConnectedEvent = Event<
   Record<any, any>
 >;
 export const TgClientConnectedEvent =
-  EventBehaviourFactory.create<TgClientConnectedEvent>(
+  EventBehavior.createCurriedNameVersion<TgClientConnectedEvent>(
     "TgClientConnectedEvent",
     "v1"
   );

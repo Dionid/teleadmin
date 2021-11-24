@@ -1,4 +1,4 @@
-import { returnOnThrow } from "@fdd-node/core/errors";
+import { returnOnThrow } from "@fdd-node-ts/core/errors";
 import { Api, TelegramClient } from "telegram";
 
 import PeerChannel = Api.PeerChannel;

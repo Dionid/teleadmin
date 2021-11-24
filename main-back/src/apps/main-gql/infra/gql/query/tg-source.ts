@@ -1,4 +1,4 @@
-import { countToNumber } from "@fdd-node/core/knex-utils";
+import { countToNumber } from "@fdd-node-ts/core/knex-utils";
 import { TgSourceResolvers } from "apps/main-gql/infra/gql/gqlgen-types";
 import { ResolversCtx } from "apps/main-gql/infra/gql/resolver-ctx";
 import { TgSourceParticipantTable } from "libs/main-db/models";

@@ -1,5 +1,5 @@
-import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
-import { CriticalError } from "@fdd-node/core/errors";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { CriticalError } from "@fdd-node-ts/core/errors";
 import { telegramClient } from "apps/main-gql/set-tg-client";
 import {
   TgUser,
@@ -13,7 +13,7 @@ export type ParseInfoAboutHomunculusCmd = Command<
   Record<any, any>
 >;
 export const ParseInfoAboutHomunculusCmd =
-  CommandBehaviorFactory<ParseInfoAboutHomunculusCmd>(
+  CommandBehavior.createCurriedType<ParseInfoAboutHomunculusCmd>(
     "ParseInfoAboutHomunculusCmd"
   );
 

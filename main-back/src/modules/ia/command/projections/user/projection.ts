@@ -1,8 +1,8 @@
 import crypto from "crypto";
 
-import { ValidationError } from "@fdd-node/core/errors";
-import { UUID } from "@fdd-node/core/fop-utils";
-import { BrandedPrimitive } from "@fop-ts/core/branded";
+import { ValidationError } from "@fdd-node-ts/core/errors";
+import { UUID } from "@fdd-node-ts/core/fop-utils";
+import { BrandedPrimitive } from "@fop-ts/core/Branded";
 import { UserTable } from "libs/main-db/models";
 
 export type UserId = BrandedPrimitive<UUID, { readonly UserId: unique symbol }>;

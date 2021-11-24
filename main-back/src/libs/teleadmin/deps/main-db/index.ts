@@ -1,4 +1,4 @@
-import * as KnexUtils from "@fdd-node/core/knex-utils";
+import * as KnexUtils from "@fdd-node-ts/core/knex-utils";
 import knex, { Knex } from "knex";
 
 import Logger = Knex.Logger;

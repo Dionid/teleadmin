@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from "async_hooks";
 
-import { CriticalError } from "@fdd-node/core/errors";
+import { CriticalError } from "@fdd-node-ts/core/errors";
 
 export type Context<S> = AsyncLocalStorage<S>;
 

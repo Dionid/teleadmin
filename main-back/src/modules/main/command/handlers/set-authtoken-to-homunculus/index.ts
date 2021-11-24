@@ -1,7 +1,7 @@
-import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
-import { EventBus } from "@fdd-node/core/eda";
-import { NotFoundError } from "@fdd-node/core/errors";
-import { NotEmptyString } from "@fop-ts/core/branded";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { NotFoundError } from "@fdd-node-ts/core/errors";
+import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { Context } from "libs/fdd-ts/context";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
 import { AuthTokenToHomunculusSetEvent } from "modules/main/command/handlers/set-authtoken-to-homunculus/events";
@@ -19,7 +19,7 @@ export type SetAuthTokenToHomunculusCmd = Command<
   }
 >;
 export const SetAuthTokenToHomunculusCmd =
-  CommandBehaviorFactory<SetAuthTokenToHomunculusCmd>(
+  CommandBehavior.createCurriedType<SetAuthTokenToHomunculusCmd>(
     "SetAuthTokenToHomunculusCmd"
   );
 

@@ -1,4 +1,4 @@
-import { returnOnThrow } from "@fdd-node/core/errors";
+import { returnOnThrow } from "@fdd-node-ts/core/errors";
 import { TgSourceInviteLinkHash } from "libs/telegram-js/types";
 import { Api, TelegramClient } from "telegram";
 

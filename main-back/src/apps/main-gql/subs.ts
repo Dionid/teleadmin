@@ -1,5 +1,6 @@
-import { Event, EventBus, EventBehaviourFactory } from "@fdd-node/core/eda";
-import { NotFoundError } from "@fdd-node/core/errors";
+import { Event, EventBehavior } from "@fdd-node-ts/core/eda/event";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { NotFoundError } from "@fdd-node-ts/core/errors";
 import {
   initTgClient,
   TgClientConnectedEvent,
@@ -19,7 +20,7 @@ export type CronSourcesParsingCompletedEvent = Event<
   Record<any, any>
 >;
 export const CronSourcesParsingCompletedEvent =
-  EventBehaviourFactory.create<CronSourcesParsingCompletedEvent>(
+  EventBehavior.createCurriedNameVersion<CronSourcesParsingCompletedEvent>(
     "CronSourcesParsingCompletedEvent",
     "v1"
   );

@@ -1,4 +1,5 @@
-import { CommandBehaviorFactory, Hybrid } from "@fdd-node/core/cqrs";
+import { CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { Hybrid } from "@fdd-node-ts/core/cqrs/hybrid";
 import { JWTToken } from "libs/teleadmin/jwt-token";
 import {
   UserDS,
@@ -22,7 +23,8 @@ export type AuthenticateCmd = Hybrid<
     jwtToken: string;
   }
 >;
-export const AuthenticateCmd = CommandBehaviorFactory("AuthenticateCmd");
+export const AuthenticateCmd =
+  CommandBehavior.createCurriedType("AuthenticateCmd");
 
 export type AuthenticateCmdHandler = ReturnType<typeof AuthenticateCmdHandler>;
 
