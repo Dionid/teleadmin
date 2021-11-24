@@ -1,8 +1,10 @@
-import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
-import { EventBus, Event, FullEvent } from "@fdd-node/core/eda";
-import { PublicError, throwOnError } from "@fdd-node/core/errors";
-import { pipeAsync } from "@fop-ts/core";
-import { NotEmptyString } from "@fop-ts/core/branded";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { Event } from "@fdd-node-ts/core/eda/event";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { FullEvent } from "@fdd-node-ts/core/eda/full-event";
+import { PublicError, throwOnError } from "@fdd-node-ts/core/errors";
+import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
+import { pipeAsync } from "@fop-ts/core/Pipe";
 import { telegramClient } from "apps/main-gql/set-tg-client";
 import { Context } from "libs/fdd-ts/context";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
@@ -32,15 +34,14 @@ export type AddPrivateSourceCmd = Command<
     sourceType: TgSourceType;
   }
 >;
-export const AddPrivateSourceCmd = CommandBehaviorFactory<AddPrivateSourceCmd>(
-  "AddPrivateSourceCmd"
-);
+export const AddPrivateSourceCmd =
+  CommandBehavior.createCurriedType<AddPrivateSourceCmd>("AddPrivateSourceCmd");
 
 export type AddPrivateSourceCmdHandler = ReturnType<
   typeof AddPrivateSourceCmdHandler
 >;
 
-const checkThatUpdates = (result: Api.TypeUpdate) => {
+const checkThatUpdates = (result: Api.TypeUpdates) => {
   if (!(result instanceof Updates)) {
     throw new PublicError(
       "Result of Api.messages.ImportChatInvite is not type Updates"
@@ -111,7 +112,7 @@ const createSource =
     );
   };
 
-const throwOnJoinChannelError = (resultOrErr: Api.TypeUpdate | Error) => {
+const throwOnJoinChannelError = (resultOrErr: Api.TypeUpdates | Error) => {
   if (resultOrErr instanceof Error) {
     if (resultOrErr.message.includes("USER_ALREADY_PARTICIPANT")) {
       throw new UserAlreadyInChannelError();

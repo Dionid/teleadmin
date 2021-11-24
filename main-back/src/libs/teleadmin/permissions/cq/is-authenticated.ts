@@ -1,8 +1,11 @@
-import { CommandOrQuery, CommandQueryHandler } from "@fdd-node/core/cqrs";
-import { PermissionDeniedError } from "@fdd-node/core/errors";
+import {
+  CommandOrQuery,
+  CommandQueryHandler,
+} from "@fdd-node-ts/core/cqrs/common";
+import { PermissionDeniedError } from "@fdd-node-ts/core/errors";
 
 export const isAuthenticated =
-  <CQ extends CommandOrQuery<any, any>, R>(
+  <CQ extends CommandOrQuery<any, any, R>, R>(
     handler: CommandQueryHandler<CQ, R>
   ) =>
   async (cq: CQ): Promise<R> => {

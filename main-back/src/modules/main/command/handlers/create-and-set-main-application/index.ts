@@ -1,5 +1,5 @@
-import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
-import { NotEmptyString } from "@fop-ts/core/branded";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { TgApplicationDS } from "modules/main/command/projections/tg-application/ds";
 import {
   TgApplication,
@@ -15,7 +15,7 @@ export type CreateAndSetMainApplicationCmd = Command<
   }
 >;
 export const CreateAndSetMainApplicationCmd =
-  CommandBehaviorFactory<CreateAndSetMainApplicationCmd>(
+  CommandBehavior.createCurriedType<CreateAndSetMainApplicationCmd>(
     "CreateAndSetMainApplicationCmd"
   );
 

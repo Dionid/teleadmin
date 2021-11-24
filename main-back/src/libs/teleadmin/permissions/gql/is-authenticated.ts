@@ -1,5 +1,5 @@
-import { PermissionDeniedError } from "@fdd-node/core/errors";
-import { Maybe } from "@fop-ts/core";
+import { PermissionDeniedError } from "@fdd-node-ts/core/errors";
+import { Maybe } from "@fop-ts/core/Types";
 import { ResolverFn } from "apps/main-gql/infra/gql/gqlgen-types";
 import { UserId } from "modules/ia/command/projections/user";
 

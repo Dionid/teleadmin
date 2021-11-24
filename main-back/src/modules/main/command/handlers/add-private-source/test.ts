@@ -1,5 +1,5 @@
-import { EventBus } from "@fdd-node/core/eda/event-bus";
-import { UUID } from "@fdd-node/core/fop-utils";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { UUID } from "@fdd-node-ts/core/fop-utils";
 import { telegramClient } from "apps/main-gql/set-tg-client";
 import { BigInteger } from "big-integer";
 import { mock, MockProxy } from "jest-mock-extended";
@@ -30,7 +30,7 @@ import GetFullChannel = Api.channels.GetFullChannel;
 import clearAllMocks = jest.clearAllMocks;
 
 jest.mock("modules/main/command/projections/tg-source/ds");
-jest.mock("@fdd-node/core/eda/event-bus");
+jest.mock("@fdd-node-ts/core/eda/event-bus");
 jest.mock("apps/main-gql/set-tg-client", () => {
   return {
     telegramClient: {

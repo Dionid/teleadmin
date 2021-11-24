@@ -1,8 +1,12 @@
-import { CommandOrQuery, CommandQueryHandler } from "@fdd-node/core/cqrs";
-import { EventBus } from "@fdd-node/core/eda";
-import { InternalError, PermissionDeniedError } from "@fdd-node/core/errors";
-import { Maybe, pipe } from "@fop-ts/core";
-import { curry } from "@fop-ts/core/function/curry";
+import {
+  CommandOrQuery,
+  CommandQueryHandler,
+} from "@fdd-node-ts/core/cqrs/common";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { InternalError, PermissionDeniedError } from "@fdd-node-ts/core/errors";
+import { curry } from "@fop-ts/core/Curry";
+import { pipe } from "@fop-ts/core/Pipe";
+import { Maybe } from "@fop-ts/core/Types";
 import { ApolloServer } from "apollo-server";
 import { ApolloServerPlugin } from "apollo-server-plugin-base";
 import { ResolversCtx } from "apps/main-gql/infra/gql/resolver-ctx";
@@ -73,7 +77,7 @@ export const initServer = (jwtSecret: string, passwordHashSalt: string) => {
       });
 
       // . ASPECTS
-      const contextAspect = <CQ extends CommandOrQuery<any, any>, R>(
+      const contextAspect = <CQ extends CommandOrQuery<any, any, R>, R>(
         handler: CommandQueryHandler<CQ, R>
       ) => Context.runC2(GlobalContext, workflowContextStorage, handler);
       const isAuthenticatedAndNotDemoAspect = pipe(

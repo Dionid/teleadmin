@@ -1,5 +1,5 @@
-import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
-import { PublicError } from "@fdd-node/core/errors";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { PublicError } from "@fdd-node-ts/core/errors";
 import {
   UserDS,
   User,
@@ -14,7 +14,7 @@ export type CreateUserCmd = Command<
     password: UserHashedPassword;
   }
 >;
-export const CreateUserCmd = CommandBehaviorFactory("CreateUserCmd");
+export const CreateUserCmd = CommandBehavior.createCurriedType("CreateUserCmd");
 
 export type CreateUserCmdHandler = typeof CreateUserCmdHandler;
 

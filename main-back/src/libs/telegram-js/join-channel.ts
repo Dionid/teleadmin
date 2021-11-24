@@ -1,14 +1,14 @@
-import { returnOnThrow } from "@fdd-node/core/errors";
+import { returnOnThrow } from "@fdd-node-ts/core/errors";
 import { TgSourceInviteLinkHash } from "libs/telegram-js/types";
 import { Api, TelegramClient } from "telegram";
 
-import TypeUpdate = Api.TypeUpdate;
+import TypeUpdates = Api.TypeUpdates;
 
 export const joinChannel =
   (client: TelegramClient) =>
   (
     sourceInviteLinkHash: TgSourceInviteLinkHash
-  ): Promise<TypeUpdate | Error> => {
+  ): Promise<TypeUpdates | Error> => {
     return returnOnThrow(() =>
       client.invoke(
         new Api.messages.ImportChatInvite({

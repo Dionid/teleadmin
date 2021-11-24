@@ -1,5 +1,5 @@
-import { EventBehaviourFactory, Event } from "@fdd-node/core/eda";
-import { NotEmptyString } from "@fop-ts/core/branded";
+import { EventBehavior, Event } from "@fdd-node-ts/core/eda/event";
+import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 
 export type AuthTokenToHomunculusSetEvent = Event<
   "AuthTokenToHomunculusSetEvent",
@@ -9,7 +9,7 @@ export type AuthTokenToHomunculusSetEvent = Event<
   }
 >;
 export const AuthTokenToHomunculusSetEvent =
-  EventBehaviourFactory.create<AuthTokenToHomunculusSetEvent>(
+  EventBehavior.createCurriedNameVersion<AuthTokenToHomunculusSetEvent>(
     "AuthTokenToHomunculusSetEvent",
     "v1"
   );

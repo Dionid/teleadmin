@@ -1,5 +1,5 @@
-import * as Env from "@fdd-node/core/env";
-import { NotFoundError } from "@fdd-node/core/errors";
+import * as Env from "@fdd-node-ts/core/env";
+import { NotFoundError } from "@fdd-node-ts/core/errors";
 import { initCronJobs } from "apps/main-gql/cron";
 import { EventBusPersistorSF } from "apps/main-gql/event-bus-persistor";
 import { initServer } from "apps/main-gql/server";

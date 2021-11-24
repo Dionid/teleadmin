@@ -1,5 +1,5 @@
-import { Command, CommandBehaviorFactory } from "@fdd-node/core/cqrs";
-import { NotFoundError } from "@fdd-node/core/errors";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { NotFoundError } from "@fdd-node-ts/core/errors";
 import { telegramClient } from "apps/main-gql/set-tg-client";
 import { TgSourceId } from "modules/main/command/projections/tg-source";
 import { TgSourceDS } from "modules/main/command/projections/tg-source/ds";
@@ -14,7 +14,9 @@ export type LeaveAndDeleteSourceCmd = Command<
   }
 >;
 export const LeaveAndDeleteSourceCmd =
-  CommandBehaviorFactory<LeaveAndDeleteSourceCmd>("LeaveAndDeleteSourceCmd");
+  CommandBehavior.createCurriedType<LeaveAndDeleteSourceCmd>(
+    "LeaveAndDeleteSourceCmd"
+  );
 
 export const LeaveAndDeleteSourceCmdHandler = async (
   cmd: LeaveAndDeleteSourceCmd

@@ -1,4 +1,4 @@
-import { FullEvent } from "@fdd-node/core/eda";
+import { FullEvent } from "@fdd-node-ts/core/eda/full-event";
 import { Knex } from "knex";
 import { EventModel } from "libs/main-db/models/event";
 

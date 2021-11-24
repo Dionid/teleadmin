@@ -1,5 +1,6 @@
-import { UUID } from "@fdd-node/core/fop-utils";
-import { BrandedPrimitive, NotEmptyString } from "@fop-ts/core/branded";
+import { UUID } from "@fdd-node-ts/core/fop-utils";
+import { BrandedPrimitive } from "@fop-ts/core/Branded";
+import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { TgUserTable } from "libs/main-db/models";
 import { Api } from "telegram";
 

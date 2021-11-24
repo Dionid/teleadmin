@@ -1,4 +1,5 @@
-import { BrandedPrimitive, NotEmptyString } from "@fop-ts/core/branded";
+import { BrandedPrimitive } from "@fop-ts/core/Branded";
+import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 
 export type TgSourceInviteLinkHash = BrandedPrimitive<
   NotEmptyString,
