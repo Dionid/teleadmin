@@ -1,5 +1,5 @@
-import { mapCommonSearchParamsToQuery } from "@fdd-node/core/apollo-knex";
-import { mapCountToNumber } from "@fdd-node/core/knex-utils";
+import { mapCommonSearchParamsToQuery } from "@fdd-node-ts/core/apollo-knex";
+import { mapCountToNumber } from "@fdd-node-ts/core/knex-utils";
 import { TgSourceAggregateResolvers } from "apps/main-gql/infra/gql/gqlgen-types";
 import { mapTgSource } from "apps/main-gql/infra/gql/mappers";
 import { ResolversCtx } from "apps/main-gql/infra/gql/resolver-ctx";

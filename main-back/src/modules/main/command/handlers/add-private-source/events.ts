@@ -1,4 +1,4 @@
-import { Event, EventBehavior } from "@fdd-node/core/eda/event";
+import { Event, EventBehavior } from "@fdd-node-ts/core/eda/event";
 import {
   TgSource,
   TgSourceId,

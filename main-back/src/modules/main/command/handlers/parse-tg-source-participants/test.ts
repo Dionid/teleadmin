@@ -1,5 +1,5 @@
-import { EventBus } from "@fdd-node/core/eda/event-bus";
-import { UUID } from "@fdd-node/core/fop-utils";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { UUID } from "@fdd-node-ts/core/fop-utils";
 import { BigInteger } from "big-integer";
 import { mock, MockProxy } from "jest-mock-extended";
 import { Knex } from "knex";
@@ -41,7 +41,7 @@ import clearAllMocks = jest.clearAllMocks;
 
 jest.mock("libs/telegram-js/check-if-me-is-channel-admin");
 jest.mock("libs/telegram-js/get-channel-partisipants");
-jest.mock("@fdd-node/core/eda/event-bus");
+jest.mock("@fdd-node-ts/core/eda/event-bus");
 jest.mock(
   "modules/main/command/handlers/parse-tg-source-participants/operations/user-presence"
 );

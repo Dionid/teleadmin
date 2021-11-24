@@ -1,4 +1,4 @@
-import { UUID } from "@fdd-node/core/fop-utils";
+import { UUID } from "@fdd-node-ts/core/fop-utils";
 import { BrandedPrimitive } from "@fop-ts/core/Branded";
 import { TgSourceParticipantTable } from "libs/main-db/models";
 import { TgSourceId } from "modules/main/command/projections/tg-source";

@@ -1,8 +1,8 @@
-import { Command, CommandBehavior } from "@fdd-node/core/cqrs/command";
-import { Event } from "@fdd-node/core/eda/event";
-import { EventBus } from "@fdd-node/core/eda/event-bus";
-import { FullEvent } from "@fdd-node/core/eda/full-event";
-import { PublicError, throwOnError } from "@fdd-node/core/errors";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { Event } from "@fdd-node-ts/core/eda/event";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { FullEvent } from "@fdd-node-ts/core/eda/full-event";
+import { PublicError, throwOnError } from "@fdd-node-ts/core/errors";
 import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { pipeAsync } from "@fop-ts/core/Pipe";
 import { telegramClient } from "apps/main-gql/set-tg-client";

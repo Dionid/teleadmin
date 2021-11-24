@@ -1,7 +1,7 @@
-import { Event } from "@fdd-node/core/eda/event";
-import { EventBus } from "@fdd-node/core/eda/event-bus";
-import { FullEvent } from "@fdd-node/core/eda/full-event";
-import { CriticalError } from "@fdd-node/core/errors";
+import { Event } from "@fdd-node-ts/core/eda/event";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { FullEvent } from "@fdd-node-ts/core/eda/full-event";
+import { CriticalError } from "@fdd-node-ts/core/errors";
 import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { Context } from "libs/fdd-ts/context";
 import { TgApplicationTable } from "libs/main-db/models";

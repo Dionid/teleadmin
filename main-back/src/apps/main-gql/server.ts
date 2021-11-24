@@ -1,9 +1,9 @@
 import {
   CommandOrQuery,
   CommandQueryHandler,
-} from "@fdd-node/core/cqrs/common";
-import { EventBus } from "@fdd-node/core/eda/event-bus";
-import { InternalError, PermissionDeniedError } from "@fdd-node/core/errors";
+} from "@fdd-node-ts/core/cqrs/common";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { InternalError, PermissionDeniedError } from "@fdd-node-ts/core/errors";
 import { curry } from "@fop-ts/core/Curry";
 import { pipe } from "@fop-ts/core/Pipe";
 import { Maybe } from "@fop-ts/core/Types";

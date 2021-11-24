@@ -1,7 +1,7 @@
-import { Command, CommandBehavior } from "@fdd-node/core/cqrs/command";
-import { EventBus } from "@fdd-node/core/eda/event-bus";
-import { FullEvent } from "@fdd-node/core/eda/full-event";
-import { PublicError, returnOnThrow } from "@fdd-node/core/errors";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { FullEvent } from "@fdd-node-ts/core/eda/full-event";
+import { PublicError, returnOnThrow } from "@fdd-node-ts/core/errors";
 import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { telegramClient } from "apps/main-gql/set-tg-client";
 import { Context } from "libs/fdd-ts/context";

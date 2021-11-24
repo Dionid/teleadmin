@@ -1,7 +1,7 @@
-import { Command, CommandBehavior } from "@fdd-node/core/cqrs/command";
-import { Event, EventBehavior } from "@fdd-node/core/eda/event";
-import { EventBus } from "@fdd-node/core/eda/event-bus";
-import { FullEvent } from "@fdd-node/core/eda/full-event";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { Event, EventBehavior } from "@fdd-node-ts/core/eda/event";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { FullEvent } from "@fdd-node-ts/core/eda/full-event";
 import { Context } from "libs/fdd-ts/context";
 import { GlobalContext } from "libs/teleadmin/contexts/global";
 import {

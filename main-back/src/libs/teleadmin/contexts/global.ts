@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from "async_hooks";
 
-import { EventBus } from "@fdd-node/core/eda/event-bus";
-import { UUID } from "@fdd-node/core/fop-utils";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { UUID } from "@fdd-node-ts/core/fop-utils";
 import { Knex } from "knex";
 import { Logger } from "libs/teleadmin/deps/logger";
 

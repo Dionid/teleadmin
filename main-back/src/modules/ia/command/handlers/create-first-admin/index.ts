@@ -1,4 +1,4 @@
-import { Command, CommandBehavior } from "@fdd-node/core/cqrs/command";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
 import {
   UserDS,
   User,

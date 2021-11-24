@@ -1,6 +1,6 @@
-import { Command, CommandBehavior } from "@fdd-node/core/cqrs/command";
-import { EventBus } from "@fdd-node/core/eda/event-bus";
-import { NotFoundError } from "@fdd-node/core/errors";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { NotFoundError } from "@fdd-node-ts/core/errors";
 import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { Context } from "libs/fdd-ts/context";
 import { GlobalContext } from "libs/teleadmin/contexts/global";

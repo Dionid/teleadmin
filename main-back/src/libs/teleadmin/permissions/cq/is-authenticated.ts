@@ -1,8 +1,8 @@
 import {
   CommandOrQuery,
   CommandQueryHandler,
-} from "@fdd-node/core/cqrs/common";
-import { PermissionDeniedError } from "@fdd-node/core/errors";
+} from "@fdd-node-ts/core/cqrs/common";
+import { PermissionDeniedError } from "@fdd-node-ts/core/errors";
 
 export const isAuthenticated =
   <CQ extends CommandOrQuery<any, any, R>, R>(

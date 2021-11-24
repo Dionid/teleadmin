@@ -1,4 +1,4 @@
-import { CriticalError } from "@fdd-node/core/errors";
+import { CriticalError } from "@fdd-node-ts/core/errors";
 import jwt from "jsonwebtoken";
 
 export type JWTToken = {

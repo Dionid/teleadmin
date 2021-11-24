@@ -1,6 +1,6 @@
-import { Event, EventBehavior } from "@fdd-node/core/eda/event";
-import { EventBus } from "@fdd-node/core/eda/event-bus";
-import { NotFoundError } from "@fdd-node/core/errors";
+import { Event, EventBehavior } from "@fdd-node-ts/core/eda/event";
+import { EventBus } from "@fdd-node-ts/core/eda/event-bus";
+import { NotFoundError } from "@fdd-node-ts/core/errors";
 import {
   initTgClient,
   TgClientConnectedEvent,

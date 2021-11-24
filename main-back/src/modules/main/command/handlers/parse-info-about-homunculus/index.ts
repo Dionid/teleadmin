@@ -1,5 +1,5 @@
-import { Command, CommandBehavior } from "@fdd-node/core/cqrs/command";
-import { CriticalError } from "@fdd-node/core/errors";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { CriticalError } from "@fdd-node-ts/core/errors";
 import { telegramClient } from "apps/main-gql/set-tg-client";
 import {
   TgUser,

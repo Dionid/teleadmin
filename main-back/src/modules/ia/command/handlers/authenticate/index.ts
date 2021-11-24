@@ -1,5 +1,5 @@
-import { CommandBehavior } from "@fdd-node/core/cqrs/command";
-import { Hybrid } from "@fdd-node/core/cqrs/hybrid";
+import { CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
+import { Hybrid } from "@fdd-node-ts/core/cqrs/hybrid";
 import { JWTToken } from "libs/teleadmin/jwt-token";
 import {
   UserDS,

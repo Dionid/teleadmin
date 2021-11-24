@@ -1,4 +1,4 @@
-import { Command, CommandBehavior } from "@fdd-node/core/cqrs/command";
+import { Command, CommandBehavior } from "@fdd-node-ts/core/cqrs/command";
 import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { TgApplicationDS } from "modules/main/command/projections/tg-application/ds";
 import {

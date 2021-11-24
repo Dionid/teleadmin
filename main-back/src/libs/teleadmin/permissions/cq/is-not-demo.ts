@@ -1,8 +1,8 @@
 import {
   CommandOrQuery,
   CommandQueryHandler,
-} from "@fdd-node/core/cqrs/common";
-import { CriticalError, PermissionDeniedError } from "@fdd-node/core/errors";
+} from "@fdd-node-ts/core/cqrs/common";
+import { CriticalError, PermissionDeniedError } from "@fdd-node-ts/core/errors";
 import { Context } from "libs/fdd-ts/context";
 import { UserTable } from "libs/main-db/models";
 import { GlobalContext } from "libs/teleadmin/contexts/global";

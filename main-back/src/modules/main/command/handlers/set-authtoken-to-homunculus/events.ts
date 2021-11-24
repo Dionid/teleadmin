@@ -1,4 +1,4 @@
-import { EventBehavior, Event } from "@fdd-node/core/eda/event";
+import { EventBehavior, Event } from "@fdd-node-ts/core/eda/event";
 import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 
 export type AuthTokenToHomunculusSetEvent = Event<

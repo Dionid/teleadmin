@@ -1,4 +1,4 @@
-import { countMoreThanZero } from "@fdd-node/core/knex-utils";
+import { countMoreThanZero } from "@fdd-node-ts/core/knex-utils";
 import { NotEmptyString } from "@fop-ts/core/Branded-common-types";
 import { Context } from "libs/fdd-ts/context";
 import { TgApplicationTable } from "libs/main-db/models";

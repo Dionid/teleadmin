@@ -1,5 +1,5 @@
-import { Command } from "@fdd-node/core/cqrs/command";
-import { CriticalError } from "@fdd-node/core/errors";
+import { Command } from "@fdd-node-ts/core/cqrs/command";
+import { CriticalError } from "@fdd-node-ts/core/errors";
 import {
   UserDS,
   User,
